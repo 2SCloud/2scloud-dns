@@ -1,4 +1,8 @@
+mod cache;
+mod records;
+
 use thiserror::Error;
+use addr::dns::Name;
 
 #[derive(Debug, Error)]
 pub enum ErrorCondition {
@@ -29,7 +33,7 @@ pub struct Header {
 impl Header {
     const DNS_HEADER_LEN: usize = 12;
 
-    // Serialize the header into a byte array
+    /// Serialize the DNS header into a byte array
     pub fn to_bytes(&self) -> Vec<u8> {
         let mut buf = Vec::with_capacity(Header::DNS_HEADER_LEN);
 
@@ -50,7 +54,7 @@ impl Header {
         buf
     }
 
-    // Deserialize the header from a byte array
+    /// Deserialize the DNS header from a byte array
     pub fn from_bytes(buf: &[u8]) -> Result<Header, ErrorCondition> {
         if buf.len() < Header::DNS_HEADER_LEN {
             return Err(ErrorCondition::DeserializationErr(
