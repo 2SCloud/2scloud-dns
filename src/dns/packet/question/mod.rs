@@ -1,7 +1,5 @@
-pub mod qclass;
-
-use crate::dns::packet::question::qclass::DNSClass;
 use crate::dns::records;
+use crate::dns::records::DNSClass;
 
 #[derive(Debug)]
 pub struct QuestionSection {
@@ -9,3 +7,4 @@ pub struct QuestionSection {
     q_type: records::DNSRecordType,
     q_class: DNSClass,
 }
+

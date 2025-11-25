@@ -38,7 +38,13 @@ fn main() {
         println!("\nReceived query from {} with length {} bytes", addr, len);
         debug_print_bytes(&buf[..len]);
 
-        let header = Header::from_bytes(&buf[..len]).expect("Could not parse DNS header");
+        let header = match Header::from_bytes(&buf[..len]) {
+            Ok(h) => h,
+            Err(e) => {
+                println!("Could not parse DNS header: {:?}", e);
+                continue;
+            }
+        };
         println!("\n{:?}", header);
     }
 }
