@@ -1,8 +1,8 @@
+use crate::dns::records::DNSRecordType;
 use std::net::IpAddr;
 use std::time::Instant;
-use crate::dns::records::DNSRecordType;
 
-pub(crate) struct DNSCacheRecord{
+pub(crate) struct DNSCacheRecord {
     record_type: DNSRecordType,
     ip_addr: IpAddr,
     domain_name: String,

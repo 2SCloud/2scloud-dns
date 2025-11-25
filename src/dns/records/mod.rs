@@ -1,7 +1,7 @@
 use crate::dns::packet::question::qclass::DNSClass;
 
 #[derive(Debug)]
-pub enum DNSRecordType{
+pub enum DNSRecordType {
     A,
     AAAA,
     AFSDB,
@@ -48,13 +48,15 @@ pub enum DNSRecordType{
     TSIG,
     TXT,
     URI,
-    ZONEMD
+    ZONEMD,
 }
 
+#[derive(Debug)]
 pub struct ResourceRecord {
-    pub name: String,
-    pub rr_type: DNSRecordType,
-    pub class: DNSClass,
-    pub ttl: u32,
-    pub rdata: Vec<u8>,
+    pub name: String,           // domain name
+    pub rr_type: DNSRecordType, // record type
+    pub class: DNSClass,        // record class
+    pub ttl: u32,               // time-to-live
+    pub rdlength: u16,          // length of rdata
+    pub rdata: Vec<u8>,         // resource data
 }

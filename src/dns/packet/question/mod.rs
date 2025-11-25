@@ -7,5 +7,5 @@ use crate::dns::records;
 pub struct QuestionSection {
     q_name: String,
     q_type: records::DNSRecordType,
-    q_class: DNSClass
+    q_class: DNSClass,
 }
