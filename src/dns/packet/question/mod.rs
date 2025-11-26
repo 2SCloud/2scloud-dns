@@ -1,6 +1,7 @@
 use crate::dns::packet::header::Header;
 use crate::dns::records;
-use crate::dns::records::DNSClass;
+use crate::dns::records::{DNSClass, DNSRecordType};
+use crate::exceptions::SCloudException;
 use crate::utils::ErrorCondition;
 
 #[derive(Debug)]
@@ -17,7 +18,7 @@ impl QuestionSection {
     pub fn to_bytes(&self) -> Vec<u8> {
         let mut buf = Vec::with_capacity(QuestionSection::DNS_QUESTION_SECTION_LEN + self.q_name.len());
 
-        buf.extend_from_slice(&self.id.to_be_bytes());
+        buf.extend_from_slice(&self.q_name.into_bytes());
         buf.push(
             (self.qr as u8) << 7
                 | self.opcode << 3
@@ -35,27 +36,29 @@ impl QuestionSection {
     }
 
     /// Deserialize the DNS question section from a byte array
-    pub fn from_bytes(buf: &[u8]) -> Result<Header, ErrorCondition> {
-        if buf.len() < QuestionSection::DNS_QUESTION_SECTION_LEN {
-            return Err(ErrorCondition::DeserializationErr(
-                "Buffer length is less than question section length".to_string(),
-            ));
+    pub fn from_bytes(buf: &[u8]) -> Result<QuestionSection, SCloudException> {
+        if buf[11..].len() < QuestionSection::DNS_QUESTION_SECTION_LEN {
+            return Err(SCloudException::SCLOUD_QUESTION_DESERIALIZATION_FAILED);
         }
 
-        Ok(Header {
-            id: u16::from_be_bytes([buf[0], buf[1]]),
-            qr: (buf[2] & 0b1000_0000) != 0,
-            opcode: (buf[2] & 0b0111_1000) >> 3,
-            aa: (buf[2] & 0b0000_0100) != 0,
-            tc: (buf[2] & 0b0000_0010) != 0,
-            rd: (buf[2] & 0b0000_0001) != 0,
-            ra: (buf[3] & 0b1000_0000) != 0,
-            z: (buf[3] & 0b0111_0000) >> 4,
-            rcode: buf[3] & 0b0000_1111,
-            qdcount: u16::from_be_bytes([buf[4], buf[5]]),
-            ancount: u16::from_be_bytes([buf[6], buf[7]]),
-            nscount: u16::from_be_bytes([buf[8], buf[9]]),
-            arcount: u16::from_be_bytes([buf[10], buf[11]]),
+        let q_name = until_null(&buf[11..])?;
+        let pos = 11 + q_name.1;
+
+        let q_type_bytes: &[u8; 2] = buf[pos..pos+2].try_into().unwrap();
+        let q_class_bytes: &[u8; 2] = buf[pos+2..pos+4].try_into().unwrap();
+
+        Ok(QuestionSection {
+            q_name: String::from_utf8(Vec::from(q_name.0))
+                .map_err(|_| SCloudException::SCLOUD_QUESTION_DESERIALIZATION_FAILED)?,
+            q_type: DNSRecordType::from(q_type_bytes),
+            q_class: DNSClass::from(q_class_bytes),
         })
+    }
+}
+
+fn until_null(buf: &[u8]) -> Result<(&[u8], usize), SCloudException> {
+    match buf.iter().position(|&b| b == 0x00) {
+        Some(pos) => Ok((&buf[..pos], buf[..pos].len())),
+        None => Err(SCloudException::SCLOUD_QUESTION_IMPOSSIBLE_PARSE_QNAME),
     }
 }

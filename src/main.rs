@@ -2,6 +2,7 @@ use std::net::UdpSocket;
 
 mod dns;
 mod utils;
+mod exceptions;
 
 use crate::dns::packet::header::Header;
 
@@ -37,15 +38,6 @@ fn main() {
 
         println!("\nReceived query from {} with length {} bytes", addr, len);
         debug_print_bytes(&buf[..len]);
-
-        let header = match Header::from_bytes(&buf[..len]) {
-            Ok(h) => h,
-            Err(e) => {
-                println!("Could not parse DNS header: {:?}", e);
-                continue;
-            }
-        };
-        let 
-        println!("\n{:?}", header);
+        
     }
 }

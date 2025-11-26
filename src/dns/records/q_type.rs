@@ -1,4 +1,10 @@
-#[derive(Debug)]
+// q_type.rs
+
+use std::convert::TryFrom;
+use crate::exceptions::SCloudException;
+use crate::SCloudException; // ton type d'erreur personnalisé
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DNSRecordType {
     A,
     AAAA,
@@ -47,4 +53,129 @@ pub enum DNSRecordType {
     TXT,
     URI,
     ZONEMD,
+    Unknown(u16),
+}
+
+impl TryFrom<u16> for DNSRecordType {
+    type Error = SCloudException;
+
+    fn try_from(v: u16) -> Result<Self, Self::Error> {
+        match v {
+            1     => Ok(DNSRecordType::A),
+            28    => Ok(DNSRecordType::AAAA),
+            18    => Ok(DNSRecordType::AFSDB),
+            42    => Ok(DNSRecordType::APL),
+            257   => Ok(DNSRecordType::CAA),
+            60    => Ok(DNSRecordType::CDNSKEY),
+            59    => Ok(DNSRecordType::CDS),
+            37    => Ok(DNSRecordType::CERT),
+            5     => Ok(DNSRecordType::CNAME),
+            62    => Ok(DNSRecordType::CSYNC),
+            49    => Ok(DNSRecordType::DHCID),
+            32769 => Ok(DNSRecordType::DLV),
+            39    => Ok(DNSRecordType::DNAME),
+            48    => Ok(DNSRecordType::DNSKEY),
+            43    => Ok(DNSRecordType::DS),
+            108   => Ok(DNSRecordType::EUI48),
+            109   => Ok(DNSRecordType::EUI64),
+            13    => Ok(DNSRecordType::HINFO),
+            55    => Ok(DNSRecordType::HIP),
+            65    => Ok(DNSRecordType::HTTPS),
+            45    => Ok(DNSRecordType::IPSECKEY),
+            25    => Ok(DNSRecordType::KEY),
+            36    => Ok(DNSRecordType::KX),
+            29    => Ok(DNSRecordType::LOC),
+            15    => Ok(DNSRecordType::MX),
+            35    => Ok(DNSRecordType::NAPTR),
+            2     => Ok(DNSRecordType::NS),
+            47    => Ok(DNSRecordType::NSEC),
+            50    => Ok(DNSRecordType::NSEC3),
+            51    => Ok(DNSRecordType::NSEC3PARAM),
+            61    => Ok(DNSRecordType::OPENPGPKEY),
+            12    => Ok(DNSRecordType::PTR),
+            17    => Ok(DNSRecordType::RP),
+            46    => Ok(DNSRecordType::RRSIG),
+            24    => Ok(DNSRecordType::SIG),
+            53    => Ok(DNSRecordType::SMIMEA),
+            6     => Ok(DNSRecordType::SOA),
+            33    => Ok(DNSRecordType::SRV),
+            44    => Ok(DNSRecordType::SSHFP),
+            64    => Ok(DNSRecordType::SVCB),
+            32768 => Ok(DNSRecordType::TA),
+            249   => Ok(DNSRecordType::TKEY),
+            52    => Ok(DNSRecordType::TLSA),
+            250   => Ok(DNSRecordType::TSIG),
+            16    => Ok(DNSRecordType::TXT),
+            256   => Ok(DNSRecordType::URI),
+            63    => Ok(DNSRecordType::ZONEMD),
+            _ => Err(SCloudException::SCLOUD_QTYPE_UNKNOWN_TYPE),
+        }
+    }
+}
+
+impl TryFrom<DNSRecordType> for u16 {
+    type Error = SCloudException;
+
+    fn try_from(rt: DNSRecordType) -> Result<Self, Self::Error> {
+        match rt {
+            DNSRecordType::Unknown(_) => Err(SCloudException::SCLOUD_QTYPE_UNKNOWN_TYPE),
+            _ => Ok(match rt {
+                DNSRecordType::A           => 1,
+                DNSRecordType::AAAA        => 28,
+                DNSRecordType::AFSDB       => 18,
+                DNSRecordType::APL         => 42,
+                DNSRecordType::CAA         => 257,
+                DNSRecordType::CDNSKEY     => 60,
+                DNSRecordType::CDS         => 59,
+                DNSRecordType::CERT        => 37,
+                DNSRecordType::CNAME       => 5,
+                DNSRecordType::CSYNC       => 62,
+                DNSRecordType::DHCID       => 49,
+                DNSRecordType::DLV         => 32769,
+                DNSRecordType::DNAME       => 39,
+                DNSRecordType::DNSKEY      => 48,
+                DNSRecordType::DS          => 43,
+                DNSRecordType::EUI48       => 108,
+                DNSRecordType::EUI64       => 109,
+                DNSRecordType::HINFO       => 13,
+                DNSRecordType::HIP         => 55,
+                DNSRecordType::HTTPS       => 65,
+                DNSRecordType::IPSECKEY    => 45,
+                DNSRecordType::KEY         => 25,
+                DNSRecordType::KX          => 36,
+                DNSRecordType::LOC         => 29,
+                DNSRecordType::MX          => 15,
+                DNSRecordType::NAPTR       => 35,
+                DNSRecordType::NS          => 2,
+                DNSRecordType::NSEC        => 47,
+                DNSRecordType::NSEC3       => 50,
+                DNSRecordType::NSEC3PARAM  => 51,
+                DNSRecordType::OPENPGPKEY  => 61,
+                DNSRecordType::PTR         => 12,
+                DNSRecordType::RP          => 17,
+                DNSRecordType::RRSIG       => 46,
+                DNSRecordType::SIG         => 24,
+                DNSRecordType::SMIMEA      => 53,
+                DNSRecordType::SOA         => 6,
+                DNSRecordType::SRV         => 33,
+                DNSRecordType::SSHFP       => 44,
+                DNSRecordType::SVCB        => 64,
+                DNSRecordType::TA          => 32768,
+                DNSRecordType::TKEY        => 249,
+                DNSRecordType::TLSA        => 52,
+                DNSRecordType::TSIG        => 250,
+                DNSRecordType::TXT         => 16,
+                DNSRecordType::URI         => 256,
+                DNSRecordType::ZONEMD      => 63,
+                _ => unreachable!(),
+            }),
+        }
+    }
+}
+
+impl From<&[u8; 2]> for DNSRecordType {
+    fn from(bytes: &[u8; 2]) -> Self {
+        let v = u16::from_be_bytes(*bytes);
+        DNSRecordType::from(v)
+    }
 }
