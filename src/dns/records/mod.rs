@@ -1,8 +1,9 @@
 pub(crate) use crate::dns::records::q_class::DNSClass;
 pub(crate) use crate::dns::records::q_type::DNSRecordType;
 
-mod q_type;
-mod q_class;
+pub(crate) mod q_type;
+pub(crate) mod q_class;
+pub(crate) mod q_name;
 
 #[derive(Debug)]
 pub struct ResourceRecord {

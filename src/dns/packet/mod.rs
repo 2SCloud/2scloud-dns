@@ -4,7 +4,6 @@ use crate::dns::packet::authority::AuthoritySection;
 use crate::dns::packet::header::Header;
 use crate::dns::packet::question::QuestionSection;
 use crate::exceptions::SCloudException;
-use crate::utils::ErrorCondition;
 
 pub mod header;
 pub(crate) mod question;
@@ -21,37 +20,46 @@ pub struct DNSPacket {
 }
 
 impl DNSPacket {
-    const DNS_HEADER_LEN: usize = 12;
-
     pub fn from_bytes(buf: &[u8]) -> Result<DNSPacket, SCloudException> {
         let mut pos = 0;
 
         let header = Header::from_bytes(&buf[pos..])?;
         pos += Header::DNS_HEADER_LEN;
 
-        let (question_section, consumed_q) =
-            QuestionSection::from_bytes(&buf[pos..])?;
-        pos += consumed_q;
+        let mut questions = Vec::new();
+        for _ in 0..header.qdcount {
+            let (q, consumed) = QuestionSection::from_bytes(&buf[pos..])?;
+            pos += consumed;
+            questions.push(q);
+        }
 
-        let (answer_section, consumed_a) =
-            AnswerSection::from_bytes(&buf[pos..])?;
-        pos += consumed_a;
+        let mut answers = Vec::new();
+        for _ in 0..header.ancount {
+            let (ans, consumed) = AnswerSection::from_bytes(&buf[pos..])?;
+            pos += consumed;
+            answers.push(ans);
+        }
 
-        let (authority_section, consumed_ns) =
-            AuthoritySection::from_bytes(&buf[pos..])?;
-        pos += consumed_ns;
+        let mut authorities = Vec::new();
+        for _ in 0..header.nscount {
+            let (ns, consumed) = AuthoritySection::from_bytes(&buf[pos..])?;
+            pos += consumed;
+            authorities.push(ns);
+        }
 
-        let (additional_section, consumed_add) =
-            AdditionalSection::from_bytes(&buf[pos..])?;
-        pos += consumed_add;
-
+        let mut additionals = Vec::new();
+        for _ in 0..header.arcount {
+            let (add, consumed) = AdditionalSection::from_bytes(&buf[pos..])?;
+            pos += consumed;
+            additionals.push(add);
+        }
 
         Ok(DNSPacket {
             header,
-            question_section,
-            answer_section,
-            authority_section,
-            additional_section
+            questions,
+            answers,
+            authorities,
+            additionals,
         })
     }
 }

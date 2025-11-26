@@ -1,6 +1,6 @@
 mod cache;
 pub(crate) mod packet;
-mod records;
+pub(crate) mod records;
 
 use crate::dns::packet::header::Header;
 use crate::dns::packet::question::QuestionSection;
