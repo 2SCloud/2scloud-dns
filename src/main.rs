@@ -4,8 +4,6 @@ mod dns;
 mod exceptions;
 mod utils;
 
-use crate::dns::packet::header::Header;
-
 fn debug_print_bytes(buf: &[u8]) {
     for (i, chunk) in buf.chunks(16).enumerate() {
         print!("{:08x}: ", i * 16);
