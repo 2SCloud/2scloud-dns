@@ -1,7 +1,7 @@
 use crate::dns::packet::answer::AnswerSection;
 use crate::dns::records;
-use crate::dns::records::{DNSClass, DNSRecordType};
 use crate::dns::records::q_name::parse_qname;
+use crate::dns::records::{DNSClass, DNSRecordType};
 use crate::exceptions::SCloudException;
 
 pub(crate) struct AuthoritySection {
@@ -14,7 +14,6 @@ pub(crate) struct AuthoritySection {
 }
 
 impl AuthoritySection {
-
     pub(crate) fn from_bytes(buf: &[u8]) -> Result<(AuthoritySection, usize), SCloudException> {
         let (q_name, consumed_name) = parse_qname(buf)?;
         let mut pos = consumed_name;
@@ -23,23 +22,23 @@ impl AuthoritySection {
             return Err(SCloudException::SCLOUD_AUTHORITY_DESERIALIZATION_FAILED);
         }
 
-        let q_type = DNSRecordType::try_from(u16::from_be_bytes([buf[pos], buf[pos+1]]))?;
+        let q_type = DNSRecordType::try_from(u16::from_be_bytes([buf[pos], buf[pos + 1]]))?;
         pos += 2;
 
-        let q_class = DNSClass::from(u16::from_be_bytes([buf[pos], buf[pos+1]]));
+        let q_class = DNSClass::from(u16::from_be_bytes([buf[pos], buf[pos + 1]]));
         pos += 2;
 
-        let ttl = u32::from_be_bytes([buf[pos], buf[pos+1], buf[pos+2], buf[pos+3]]);
+        let ttl = u32::from_be_bytes([buf[pos], buf[pos + 1], buf[pos + 2], buf[pos + 3]]);
         pos += 4;
 
-        let rdlength = u16::from_be_bytes([buf[pos], buf[pos+1]]);
+        let rdlength = u16::from_be_bytes([buf[pos], buf[pos + 1]]);
         pos += 2;
 
         if buf.len() < pos + rdlength as usize {
             return Err(SCloudException::SCLOUD_AUTHORITY_DESERIALIZATION_FAILED);
         }
 
-        let rdata = buf[pos .. pos + rdlength as usize].to_vec();
+        let rdata = buf[pos..pos + rdlength as usize].to_vec();
         pos += rdlength as usize;
 
         Ok((
@@ -51,7 +50,7 @@ impl AuthoritySection {
                 rdlength,
                 rdata,
             },
-            pos
+            pos,
         ))
     }
 
@@ -68,8 +67,8 @@ impl AuthoritySection {
         }
         buf.push(0x00);
 
-        let qtype_u16 = u16::try_from(self.q_type)
-            .expect("Cannot convert AuthoritySection q_type to u16");
+        let qtype_u16 =
+            u16::try_from(self.q_type).expect("Cannot convert AuthoritySection q_type to u16");
         buf.extend_from_slice(&qtype_u16.to_be_bytes());
 
         let qclass_u16 = u16::from(self.q_class);
@@ -81,5 +80,4 @@ impl AuthoritySection {
 
         buf
     }
-
 }

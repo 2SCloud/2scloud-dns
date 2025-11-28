@@ -1,5 +1,5 @@
-use crate::dns::records::{DNSClass, DNSRecordType};
 use crate::dns::records::q_name::parse_qname;
+use crate::dns::records::{DNSClass, DNSRecordType};
 use crate::exceptions::SCloudException;
 
 /// A DNS Question section
@@ -26,8 +26,8 @@ impl QuestionSection {
         }
         buf.push(0x00);
 
-        let q_type_u16 = u16::try_from(self.q_type)
-            .expect("Cannot convert QuestionSection q_type to u16");
+        let q_type_u16 =
+            u16::try_from(self.q_type).expect("Cannot convert QuestionSection q_type to u16");
         let q_class_u16 = u16::from(self.q_class);
 
         buf.extend_from_slice(&q_type_u16.to_be_bytes());

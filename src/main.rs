@@ -1,8 +1,8 @@
 use std::net::UdpSocket;
 
 mod dns;
-mod utils;
 mod exceptions;
+mod utils;
 
 use crate::dns::packet::header::Header;
 
@@ -38,6 +38,5 @@ fn main() {
 
         println!("\nReceived query from {} with length {} bytes", addr, len);
         debug_print_bytes(&buf[..len]);
-        
     }
 }

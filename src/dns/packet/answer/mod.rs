@@ -1,5 +1,5 @@
-use crate::dns::records::{DNSClass, DNSRecordType};
 use crate::dns::records::q_name::parse_qname;
+use crate::dns::records::{DNSClass, DNSRecordType};
 use crate::exceptions::SCloudException;
 
 #[derive(Debug)]
@@ -28,8 +28,8 @@ impl AnswerSection {
         }
         buf.push(0x00);
 
-        let rtype_u16 = u16::try_from(self.r_type)
-            .expect("Cannot convert AnswerSection q_type to u16");
+        let rtype_u16 =
+            u16::try_from(self.r_type).expect("Cannot convert AnswerSection q_type to u16");
         buf.extend_from_slice(&rtype_u16.to_be_bytes());
 
         let rclass_u16 = u16::from(self.r_class);
@@ -51,23 +51,23 @@ impl AnswerSection {
             return Err(SCloudException::SCLOUD_ANSWER_DESERIALIZATION_FAILED);
         }
 
-        let r_type = DNSRecordType::try_from(u16::from_be_bytes([buf[pos], buf[pos+1]]))?;
+        let r_type = DNSRecordType::try_from(u16::from_be_bytes([buf[pos], buf[pos + 1]]))?;
         pos += 2;
 
-        let r_class = DNSClass::from(u16::from_be_bytes([buf[pos], buf[pos+1]]));
+        let r_class = DNSClass::from(u16::from_be_bytes([buf[pos], buf[pos + 1]]));
         pos += 2;
 
-        let ttl = u32::from_be_bytes([buf[pos], buf[pos+1], buf[pos+2], buf[pos+3]]);
+        let ttl = u32::from_be_bytes([buf[pos], buf[pos + 1], buf[pos + 2], buf[pos + 3]]);
         pos += 4;
 
-        let rdlength = u16::from_be_bytes([buf[pos], buf[pos+1]]);
+        let rdlength = u16::from_be_bytes([buf[pos], buf[pos + 1]]);
         pos += 2;
 
         if buf.len() < pos + rdlength as usize {
             return Err(SCloudException::SCLOUD_ANSWER_DESERIALIZATION_FAILED);
         }
 
-        let rdata = buf[pos .. pos + rdlength as usize].to_vec();
+        let rdata = buf[pos..pos + rdlength as usize].to_vec();
         pos += rdlength as usize;
 
         Ok((
@@ -79,7 +79,7 @@ impl AnswerSection {
                 rdlength,
                 rdata,
             },
-            pos
+            pos,
         ))
     }
 }

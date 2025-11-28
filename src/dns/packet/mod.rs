@@ -5,11 +5,11 @@ use crate::dns::packet::header::Header;
 use crate::dns::packet::question::QuestionSection;
 use crate::exceptions::SCloudException;
 
+mod additional;
+mod answer;
+mod authority;
 pub mod header;
 pub(crate) mod question;
-mod answer;
-mod additional;
-mod authority;
 
 pub struct DNSPacket {
     pub header: Header,
