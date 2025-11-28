@@ -10,6 +10,9 @@ pub(crate) enum SCloudException {
     // ANSWER SECTION
     SCLOUD_ANSWER_DESERIALIZATION_FAILED,
 
+    // AUTHORITY SECTION
+    SCLOUD_AUTHORITY_DESERIALIZATION_FAILED,
+
     // QTYPE
     SCLOUD_QTYPE_UNKNOWN_TYPE
 
@@ -28,6 +31,9 @@ impl SCloudException {
 
             // ANSWER SECTION
             SCloudException::SCLOUD_ANSWER_DESERIALIZATION_FAILED => "Buffer length is less than answer section length.",
+
+            // AUTHORITY SECTION
+            SCloudException::SCLOUD_AUTHORITY_DESERIALIZATION_FAILED => "Buffer length is less than authority section length.",
 
             // QTYPE
             SCloudException::SCLOUD_QTYPE_UNKNOWN_TYPE => "Unknown q_type",

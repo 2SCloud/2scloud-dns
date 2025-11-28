@@ -4,7 +4,7 @@ use crate::exceptions::SCloudException;
 
 #[derive(Debug)]
 pub struct AnswerSection {
-    pub name: String,
+    pub q_name: String,
     pub r_type: DNSRecordType,
     pub r_class: DNSClass,
     pub ttl: u32,
@@ -18,14 +18,18 @@ impl AnswerSection {
         let mut buf = Vec::new();
 
         // Encode NAME
-        for label in self.name.split('.') {
-            buf.push(label.len() as u8);
+        for label in self.q_name.split('.') {
+            let len = label.len();
+            if len > 63 {
+                panic!("Label too long for DNS: {}", label);
+            }
+            buf.push(len as u8);
             buf.extend_from_slice(label.as_bytes());
         }
         buf.push(0x00);
 
         let rtype_u16 = u16::try_from(self.r_type)
-            .expect("Failed to convert r_type into u16");
+            .expect("Cannot convert AnswerSection q_type to u16");
         buf.extend_from_slice(&rtype_u16.to_be_bytes());
 
         let rclass_u16 = u16::from(self.r_class);
@@ -40,7 +44,7 @@ impl AnswerSection {
 
     /// Deserialize one AnswerSection and return (section, consumed_bytes)
     pub fn from_bytes(buf: &[u8]) -> Result<(AnswerSection, usize), SCloudException> {
-        let (name, consumed_name) = parse_qname(buf)?;
+        let (q_name, consumed_name) = parse_qname(buf)?;
         let mut pos = consumed_name;
 
         if buf.len() < pos + 10 {
@@ -68,7 +72,7 @@ impl AnswerSection {
 
         Ok((
             AnswerSection {
-                name,
+                q_name,
                 r_type,
                 r_class,
                 ttl,
