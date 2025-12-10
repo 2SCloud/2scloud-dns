@@ -33,8 +33,14 @@ jobs:
         run: |
           cargo llvm-cov --json > coverage.json
 
-      - name: Generate Markdown table
+      - name: Generate Markdown coverage report
         run: python3 coverage_report.py
+
+      - name: Update README with coverage
+        run: |
+          # Replace the placeholder <!-- COVERAGE_START --> ... <!-- COVERAGE_END --> in README.md
+          sed -i '/<!-- COVERAGE_START -->/,/<!-- COVERAGE_END -->/c\
+          <!-- COVERAGE_START -->\n'"$(cat COVERAGE.md)"'\n<!-- COVERAGE_END -->' README.md
 
       - name: Commit and push coverage report
         env:
@@ -42,6 +48,6 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add COVERAGE.md
+          git add COVERAGE.md README.md
           git diff --cached --quiet || git commit -m "Update coverage report"
           git push https://x-access-token:${GITHUB_TOKEN}@github.com/2SCloud/2scloud-dns.git HEAD:main
