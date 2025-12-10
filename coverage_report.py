@@ -15,9 +15,9 @@ def bgcolor(percent):
     else:
         return "#4eff3a"
 
-md_lines = []
-md_lines.append("| Filename | Function Coverage | Line Coverage | Region Coverage | Branch Coverage |")
-md_lines.append("|---|---|---|---|---|")
+html_lines = []
+html_lines.append("<table>")
+html_lines.append("<tr><th>Filename</th><th>Function Coverage</th><th>Line Coverage</th><th>Region Coverage</th><th>Branch Coverage</th></tr>")
 
 for item in data["data"]:
     for file_cov in item["files"]:
@@ -34,9 +34,11 @@ for item in data["data"]:
         region_cov = f'<td style="background-color:{bgcolor(region_cov_val)}">{region_cov_val:.2f}% ({summary["regions"]["covered"]}/{summary["regions"]["count"]})</td>'
         branch_cov = f'<td style="background-color:{bgcolor(branch_cov_val)}">{branch_cov_val:.2f}% ({summary["branches"]["covered"]}/{summary["branches"]["count"]})</td>'
 
-        md_lines.append(f"| {filename} | {func_cov} | {line_cov} | {region_cov} | {branch_cov} |")
+        html_lines.append(f"<tr><td>{filename}</td>{func_cov}{line_cov}{region_cov}{branch_cov}</tr>")
+
+html_lines.append("</table>")
 
 with open("COVERAGE.md", "w") as f:
-    f.write("\n".join(md_lines))
+    f.write("\n".join(html_lines))
 
-print("COVERAGE.md generated with colored table cells!")
+print("COVERAGE.md generated with full HTML heatmap table!")
