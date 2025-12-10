@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
@@ -35,7 +35,7 @@ jobs:
       - name: Generate Markdown table
         run: python3 coverage_report.py
 
-      - name: Commit coverage report
+      - name: Commit and push coverage report
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -43,4 +43,4 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add COVERAGE.md
           git diff --cached --quiet || git commit -m "Update coverage report"
-          git push https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git HEAD:main
+          git push origin HEAD:main
