@@ -36,9 +36,6 @@ jobs:
       - name: Generate Markdown coverage report
         run: python3 coverage_report.py
 
-      - name: Update README with coverage
-        run: ./update_readme_coverage.sh
-
       - name: Commit and push coverage report
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
