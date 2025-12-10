@@ -38,9 +38,13 @@ jobs:
 
       - name: Update README with coverage
         run: |
-          # Replace the placeholder <!-- COVERAGE_START --> ... <!-- COVERAGE_END --> in README.md
-          sed -i '/<!-- COVERAGE_START -->/,/<!-- COVERAGE_END -->/c\
-          <!-- COVERAGE_START -->\n'"$(cat COVERAGE.md)"'\n<!-- COVERAGE_END -->' README.md
+          #!/bin/bash
+          # Create temporary README
+          awk -v coverage="$(cat COVERAGE.md)" '
+            /<!-- COVERAGE_START -->/ {print; print coverage; getline; while(!/<!-- COVERAGE_END -->/){getline}; print; next}
+            {print}
+          ' README.md > README.tmp
+          mv README.tmp README.md
 
       - name: Commit and push coverage report
         env:
