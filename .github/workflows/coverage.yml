@@ -5,6 +5,8 @@ on:
     branches:
       - main
   pull_request:
+    branches:
+      - main
 
 jobs:
   coverage:
@@ -29,4 +31,12 @@ jobs:
           cargo llvm-cov --json > coverage.json
 
       - name: Generate Markdown table
-        run: python3 coverage_report.py
+        run: python3 generate_md.py
+
+      - name: Commit coverage report
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add COVERAGE.md
+          git commit -m "Update coverage report" || echo "No changes to commit"
+          git push
