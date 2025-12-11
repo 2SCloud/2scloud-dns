@@ -2,6 +2,7 @@
 #[cfg(test)]
 mod tests {
     use crate::dns::packet::header::Header;
+    use crate::exceptions::SCloudException;
 
     #[test]
     fn test_header_to_bytes() {
@@ -35,6 +36,18 @@ mod tests {
 
         println!("expected: {:?}, got: {:?}", expected, result);
         assert_eq!(expected, result);
+    }
+
+    #[test]
+    fn test_header_deserialization_failure() {
+        let result = Header::from_bytes(&[0xAA, 0xAA, 0x01, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00]);
+        assert!(matches!(result, Err(SCloudException::SCLOUD_HEADER_DESERIALIZATION_FAILED)));
+    }
+
+    #[test]
+    fn test_header_deserialization_buffer_empty() {
+        let result = Header::from_bytes(&[]);
+        assert!(matches!(result, Err(SCloudException::SCLOUD_HEADER_BYTES_EMPTY)));
     }
 
 }

@@ -45,6 +45,11 @@ impl Header {
 
     /// Deserialize the DNS header from a byte array
     pub fn from_bytes(buf: &[u8]) -> Result<Header, SCloudException> {
+
+        if buf.len() == 0 {
+            return Err(SCloudException::SCLOUD_HEADER_BYTES_EMPTY);
+        }
+
         if buf.len() < Header::DNS_HEADER_LEN {
             return Err(SCLOUD_HEADER_DESERIALIZATION_FAILED);
         }
