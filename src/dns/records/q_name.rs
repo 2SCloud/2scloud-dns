@@ -9,8 +9,9 @@ pub(crate) fn parse_qname(buf: &[u8]) -> Result<(String, usize), SCloudException
     let mut consumed = 0;
 
     loop {
+        // TODO: check that seems weird cauz the buffer is normally always greater than 0.
         if pos >= buf.len() {
-            return Err(SCloudException::SCLOUD_IMPOSSIBLE_PARSE_QNAME);
+            return Err(SCloudException::SCLOUD_IMPOSSIBLE_PARSE_QNAME_POS_GREATER_THAN_BUF);
         }
 
         let len = buf[pos];

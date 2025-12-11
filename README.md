@@ -1,8 +1,19 @@
-# 2SCloud DNS
+<h1 style="text-align:center; font-size:60px;">2SCloud DNS</h1>
 
-[![Coverage](https://img.shields.io/endpoint?url=https://2scloud.github.io/2scloud-dns/coverage_badge.json)](https://2scloud.github.io/2scloud-dns/coverage/)
-[![Build Status](https://img.shields.io/github/actions/workflow/status/2SCloud/2scloud-dns/coverage.yml?branch=main)](https://github.com/2SCloud/2scloud-dns/actions)
-[![License](https://img.shields.io/github/license/2SCloud/2scloud-dns)](LICENSE)
+---
+
+<p align="center">
+  <a href="https://2scloud.github.io/2scloud-dns/coverage/">
+    <img src="https://img.shields.io/endpoint?url=https://2scloud.github.io/2scloud-dns/coverage_badge.json" alt="Coverage">
+  </a>
+  <a href="https://github.com/2SCloud/2scloud-dns/actions">
+    <img src="https://img.shields.io/github/actions/workflow/status/2SCloud/2scloud-dns/coverage.yml?branch=main" alt="Build Status">
+  </a>
+  <a href="LICENSE">
+    <img src="https://img.shields.io/github/license/2SCloud/2scloud-dns" alt="License">
+  </a>
+</p>
+
 
 `2scloud-dns` is a Rust application for managing and querying DNS servers. It allows you to build and send DNS queries, analyze responses, and view DNS records conveniently.
 

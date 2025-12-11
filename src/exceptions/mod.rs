@@ -21,6 +21,7 @@ pub enum SCloudException {
 
     // QNAME
     SCLOUD_IMPOSSIBLE_PARSE_QNAME,
+    SCLOUD_IMPOSSIBLE_PARSE_QNAME_POS_GREATER_THAN_BUF,
     SCLOUD_IMPOSSIBLE_PARSE_QNAME_COMPRESSION_FAILED,
     
     // QTYPE
@@ -34,7 +35,7 @@ impl SCloudException {
             SCloudException::SCLOUD_HEADER_DESERIALIZATION_FAILED => {
                 "Buffer length is less than header length."
             }
-            
+
             SCloudException::SCLOUD_HEADER_BYTES_EMPTY => {
                 "The header is empty."
             }
@@ -65,6 +66,9 @@ impl SCloudException {
             }
             SCloudException::SCLOUD_IMPOSSIBLE_PARSE_QNAME_COMPRESSION_FAILED => {
                 "Impossible to parse the `q_name`, compression 0xC0xx failed."
+            }
+            SCloudException::SCLOUD_IMPOSSIBLE_PARSE_QNAME_POS_GREATER_THAN_BUF => {
+                "Impossible to parse the `q_name`, pos is greater than buffer length."
             }
 
             // QTYPE

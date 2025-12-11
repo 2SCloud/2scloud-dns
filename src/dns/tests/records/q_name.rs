@@ -1,8 +1,8 @@
 
 #[cfg(test)]
 mod tests {
-    use std::result;
     use crate::dns::records::q_name::{parse_qname, parse_qname_at};
+    use crate::exceptions::SCloudException;
 
     #[test]
     fn test_parse_qname() {
@@ -52,5 +52,20 @@ mod tests {
         println!("expected: rust.trends.com\ngot: {:?}", qname);
         assert_eq!(qname, "rust.trends.com");
     }
+
+    #[test]
+    fn test_pos_superior_to_buf_len(){
+        let bytes: &[u8] = &[0x01, 0x01];
+        let result = parse_qname(bytes);
+        println!("expected: SCloudException::SCLOUD_IMPOSSIBLE_PARSE_QNAME_POS_GREATER_THAN_BUF\ngot: {:?}", parse_qname(bytes));
+        assert!(matches!(result, Err(SCloudException::SCLOUD_IMPOSSIBLE_PARSE_QNAME_POS_GREATER_THAN_BUF)));
+    }
+
+/*    #[test]
+    fn test_pos_and_len_superior_to_buf_len(){
+        let bytes: &[u8] = &[];
+        let result = parse_qname(bytes);
+        assert!(matches!(result, Err(SCloudException::SCLOUD_IMPOSSIBLE_PARSE_QNAME)));
+    }*/
 
 }
