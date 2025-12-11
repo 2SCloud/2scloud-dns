@@ -32,7 +32,7 @@ jobs:
 
       - name: Generate HTML coverage report
         run: |
-          cargo llvm-cov --html --output-path coverage
+          cargo llvm-cov --html coverage
 
       - name: Upload coverage artifact for Pages
         uses: actions/upload-pages-artifact@v3
