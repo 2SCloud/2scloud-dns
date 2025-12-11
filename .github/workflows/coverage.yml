@@ -28,8 +28,10 @@ jobs:
           rustup component add llvm-tools-preview
           cargo install cargo-llvm-cov
 
-      - name: Generate HTML coverage report
-        run: cargo llvm-cov --html
+      - name: Generate HTML & JSON coverage report
+        run: |
+          cargo llvm-cov --json > coverage.json
+          cargo llvm-cov --html
 
       - name: Build Pages site structure
         run: |
@@ -78,7 +80,20 @@ jobs:
               </p>
               </body>
               </html>
-              EOF
+          
+          PERCENT=$(jq '.data[0].totals.lines.percent' coverage.json | xargs printf "%.0f")
+          if [ "$PERCENT" -ge 90 ]; then COLOR="brightgreen"; 
+          elif [ "$PERCENT" -ge 75 ]; then COLOR="yellowgreen"; 
+          else COLOR="red"; 
+          fi
+
+          cat > site/coverage_badge.json <<EOF
+          {
+            "schemaVersion": 1,
+            "label": "coverage",
+            "message": "${PERCENT}%",
+            "color": "${COLOR}"
+          }
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3

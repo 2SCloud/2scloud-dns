@@ -1,5 +1,6 @@
 # 2SCloud DNS
 
+[![Coverage](https://img.shields.io/endpoint?url=https://2scloud.github.io/2scloud-dns/coverage_badge.json)](https://2scloud.github.io/2scloud-dns/coverage/)
 [![Build Status](https://img.shields.io/github/workflow/status/2SCloud/2scloud-dns/CI)](https://github.com/2SCloud/2scloud-dns/actions)
 [![License](https://img.shields.io/github/license/2SCloud/2scloud-dns)](LICENSE)
 
@@ -51,7 +52,7 @@ The application includes unit tests:
 cargo test
 ```
 
-To see test coverage, check `COVERAGE.md`.
+To see test coverage, check https://2scloud.github.io/2scloud-dns/.
 
 ---
 
