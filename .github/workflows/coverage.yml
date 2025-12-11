@@ -80,6 +80,7 @@ jobs:
               </p>
               </body>
               </html>
+          EOF
           
           PERCENT=$(jq '.data[0].totals.lines.percent' coverage.json | xargs printf "%.0f")
           if [ "$PERCENT" -ge 90 ]; then COLOR="brightgreen"; 
