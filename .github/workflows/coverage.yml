@@ -82,7 +82,11 @@ jobs:
               </html>
           EOF
           
-          PERCENT=$(jq '.data[0].totals.lines.percent' coverage.json | xargs printf "%.0f")
+          LINE=$(jq '.data[0].totals.lines.percent' coverage.json)
+          FUNC=$(jq '.data[0].totals.functions.percent' coverage.json)
+          REGION=$(jq '.data[0].totals.regions.percent' coverage.json)
+  
+          PERCENT=$(echo "($LINE + $FUNC + $REGION)/3" | bc -l | xargs printf "%.2f")
           if [ "$PERCENT" -ge 90 ]; then COLOR="brightgreen"; 
           elif [ "$PERCENT" -ge 75 ]; then COLOR="yellowgreen"; 
           else COLOR="red"; 
