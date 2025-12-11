@@ -1,7 +1,5 @@
 <h1 style="text-align:center; font-size:60px;">2SCloud DNS</h1>
 
----
-
 <p align="center">
   <a href="https://2scloud.github.io/2scloud-dns/coverage/">
     <img src="https://img.shields.io/endpoint?url=https://2scloud.github.io/2scloud-dns/coverage_badge.json" alt="Coverage">
