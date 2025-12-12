@@ -25,7 +25,7 @@ mod tests {
     fn test_answer_deserialization_fails_when_buf_lower_than_pos10() {
         let mut buf = vec![3, b'w', b'w', b'w', 0];
 
-        let result = AnswerSection::from_bytes(&buf);
+        let result = AnswerSection::from_bytes(&buf, 0);
 
         assert_eq!(
             result.unwrap_err(),
@@ -44,7 +44,7 @@ mod tests {
             0x00, 0x05,
         ]);
 
-        let result = AnswerSection::from_bytes(&buf);
+        let result = AnswerSection::from_bytes(&buf, 0);
 
         assert_eq!(
             result.unwrap_err(),
