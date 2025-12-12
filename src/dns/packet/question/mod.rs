@@ -13,14 +13,14 @@ pub struct QuestionSection {
 
 impl QuestionSection {
     /// Serialize the DNS question section into a byte array
-    pub fn to_bytes(&self) -> Vec<u8> {
+    pub fn to_bytes(&self) -> Result<Vec<u8>, SCloudException> {
         let mut buf = Vec::with_capacity(self.q_name.len() + 5);
 
         // Encode QNAME
         for label in self.q_name.split('.') {
             let len = label.len();
             if len > 63 {
-                panic!("Label too long for DNS: {}", label);
+                return Err(SCloudException::SCLOUD_QUESTION_SERIALIZATION_FAILED_QNAME_TOO_LONG);
             }
             buf.push(len as u8);
             buf.extend_from_slice(label.as_bytes());
@@ -34,7 +34,7 @@ impl QuestionSection {
         buf.extend_from_slice(&q_type_u16.to_be_bytes());
         buf.extend_from_slice(&q_class_u16.to_be_bytes());
 
-        buf
+        Ok(buf)
     }
 
     /// Deserialize the DNS question section from a byte array

@@ -10,6 +10,7 @@ pub enum SCloudException {
 
     // QUESTION SECTION
     SCLOUD_QUESTION_DESERIALIZATION_FAILED,
+    SCLOUD_QUESTION_SERIALIZATION_FAILED_QNAME_TOO_LONG,
 
     // ANSWER SECTION
     SCLOUD_ANSWER_DESERIALIZATION_FAILED,
@@ -44,6 +45,9 @@ impl SCloudException {
             // QUESTION SECTION
             SCloudException::SCLOUD_QUESTION_DESERIALIZATION_FAILED => {
                 "Buffer length is less than question section length."
+            }
+            SCloudException::SCLOUD_QUESTION_SERIALIZATION_FAILED_QNAME_TOO_LONG => {
+                "`q_name` too long."
             }
 
             // ANSWER SECTION

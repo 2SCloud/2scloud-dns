@@ -69,9 +69,12 @@ impl DNSPacket {
     // TODO: make the others parts of the DNSPacket
     /// Serialize the DNS packet into a byte array
     pub fn to_bytes(obj: DNSPacket) -> Result<Vec<u8>, SCloudException> {
-        let mut bytes = Vec::with_capacity(12);
+        let mut bytes = Vec::new();
 
         bytes.extend_from_slice(&obj.header.to_bytes()?);
+        for q in obj.questions {
+            bytes.extend_from_slice(&q.to_bytes()?);
+        }
 
         Ok(bytes)
     }
