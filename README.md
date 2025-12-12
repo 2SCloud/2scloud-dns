@@ -64,7 +64,7 @@ The application includes unit tests:
 cargo test
 ```
 
-To see test coverage, check https://2scloud.github.io/2scloud-dns/.
+To see test coverage, check https://2scloud.github.io/2scloud-dns/coverage.
 
 ---
 
