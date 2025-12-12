@@ -22,6 +22,7 @@ pub enum SCloudException {
 
     // AUTHORITY SECTION
     SCLOUD_AUTHORITY_DESERIALIZATION_FAILED,
+    SCLOUD_AUTHORITY_DESERIALIZATION_FAILED_BUF_LOWER_THAN_POS10,
 
     // ADDITIONAL SECTION
     SCLOUD_ADDITIONAL_DESERIALIZATION_FAILED,
@@ -73,6 +74,9 @@ impl SCloudException {
             // AUTHORITY SECTION
             SCloudException::SCLOUD_AUTHORITY_DESERIALIZATION_FAILED => {
                 "Buffer length is less than authority section length."
+            }
+            SCloudException::SCLOUD_AUTHORITY_DESERIALIZATION_FAILED_BUF_LOWER_THAN_POS10 => {
+                "Impossible to deserialize, `buf.len()` is lower than `pos+10`."
             }
 
             // ADDITIONAL SECTION

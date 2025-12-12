@@ -7,21 +7,21 @@ use crate::exceptions::SCloudException;
 #[derive(PartialEq)]
 #[derive(Debug)]
 pub(crate) struct AuthoritySection {
-    q_name: String,
-    q_type: records::DNSRecordType,
-    q_class: DNSClass,
-    ttl: u32,
-    pub rdlength: u16,
-    pub rdata: Vec<u8>,
+    pub(crate) q_name: String,
+    pub(crate) q_type: DNSRecordType,
+    pub(crate) q_class: DNSClass,
+    pub(crate) ttl: u32,
+    pub(crate) rdlength: u16,
+    pub(crate) rdata: Vec<u8>,
 }
 
 impl AuthoritySection {
-    pub(crate) fn from_bytes(buf: &[u8]) -> Result<(AuthoritySection, usize), SCloudException> {
-        let (q_name, consumed_name) = parse_qname(buf, 0)?;
-        let mut pos = consumed_name;
+    pub(crate) fn from_bytes(buf: &[u8], start: usize) -> Result<(AuthoritySection, usize), SCloudException> {
+        let (q_name, consumed_name) = parse_qname(buf, start)?;
+        let mut pos = start + consumed_name;
 
         if buf.len() < pos + 10 {
-            return Err(SCloudException::SCLOUD_AUTHORITY_DESERIALIZATION_FAILED);
+            return Err(SCloudException::SCLOUD_AUTHORITY_DESERIALIZATION_FAILED_BUF_LOWER_THAN_POS10);
         }
 
         let q_type = DNSRecordType::try_from(u16::from_be_bytes([buf[pos], buf[pos + 1]]))?;
@@ -52,7 +52,7 @@ impl AuthoritySection {
                 rdlength,
                 rdata,
             },
-            pos,
+            pos - start,
         ))
     }
 

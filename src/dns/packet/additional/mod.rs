@@ -17,8 +17,8 @@ pub(crate) struct AdditionalSection {
 }
 
 impl AdditionalSection {
-    pub(crate) fn from_bytes(buf: &[u8]) -> Result<(AdditionalSection, usize), SCloudException> {
-        let (q_name, consumed_name) = parse_qname(buf, 0)?;
+    pub(crate) fn from_bytes(buf: &[u8], offset: usize) -> Result<(AdditionalSection, usize), SCloudException> {
+        let (q_name, consumed_name) = parse_qname(buf, offset)?;
         let mut pos = consumed_name;
 
         if buf.len() < pos + 10 {

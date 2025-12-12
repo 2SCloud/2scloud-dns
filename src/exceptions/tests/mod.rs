@@ -7,7 +7,7 @@ mod tests{
     #[test]
     fn test_exceptions_to_str(){
         let mut i: usize = 0;
-        let ex_msg_array: [&'static str; 15] = [
+        let ex_msg_array: [&'static str; 16] = [
             //HEADER SECTION
             "Buffer length is less than header length.",
             "The header is empty.",
@@ -21,6 +21,7 @@ mod tests{
             "Impossible to deserialize, `buf.len()` is lower than `pos+rdlength`.",
             // AUTHORITY SECTION
             "Buffer length is less than authority section length.",
+            "Impossible to deserialize, `buf.len()` is lower than `pos+10`.",
             // ADDITIONAL SECTION
             "Buffer length is less than additional section length.",
             // QNAME
