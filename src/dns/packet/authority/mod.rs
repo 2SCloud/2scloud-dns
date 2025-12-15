@@ -18,13 +18,13 @@ impl AuthoritySection {
         buf: &[u8],
         offset: usize,
     ) -> Result<(AuthoritySection, usize), SCloudException> {
-        let (q_name, mut pos) = parse_qname(buf, offset)?;
+        let (q_name, mut pos) = parse_qname(buf, offset).unwrap();
 
         if buf.len() < pos + 10 {
             return Err(SCloudException::SCLOUD_AUTHORITY_DESERIALIZATION_FAILED_BUF_TOO_SHORT);
         }
 
-        let q_type = DNSRecordType::try_from(u16::from_be_bytes([buf[pos], buf[pos + 1]]))?;
+        let q_type = DNSRecordType::try_from(u16::from_be_bytes([buf[pos], buf[pos + 1]])).unwrap();
         pos += 2;
 
         let q_class = DNSClass::from(u16::from_be_bytes([buf[pos], buf[pos + 1]]));
@@ -42,7 +42,7 @@ impl AuthoritySection {
             );
         }
 
-        let (ns_name, _) = parse_qname(buf, pos)?;
+        let (ns_name, _) = parse_qname(buf, pos).unwrap();
 
         pos += rdlength as usize;
 

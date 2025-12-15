@@ -1,5 +1,4 @@
 use crate::exceptions::SCloudException;
-use crate::exceptions::SCloudException::SCLOUD_HEADER_DESERIALIZATION_FAILED;
 
 #[derive(Debug, PartialEq)]
 pub struct Header {
@@ -69,7 +68,7 @@ impl Header {
         }
 
         if buf.len() < Header::DNS_HEADER_LEN {
-            return Err(SCLOUD_HEADER_DESERIALIZATION_FAILED);
+            return Err(SCloudException::SCLOUD_HEADER_DESERIALIZATION_FAILED);
         }
 
         Ok(Header {

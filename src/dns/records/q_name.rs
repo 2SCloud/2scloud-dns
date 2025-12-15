@@ -2,7 +2,10 @@ use crate::exceptions::SCloudException;
 
 // TODO: check this function because QNAME start at byte 12, and he seems to not take that in count.
 /// Proper DNS QNAME parsing (length-label encoded + compression support)
-pub(crate) fn parse_qname(buf: &[u8], mut pos: usize) -> Result<(String, usize), SCloudException> {
+pub(crate) fn parse_qname(
+    buf: &[u8],
+    mut pos: usize,
+) -> Result<(String, usize), SCloudException> {
     let mut labels = Vec::new();
     let mut jumped = false;
     let mut end_pos = pos;
@@ -50,7 +53,7 @@ pub(crate) fn parse_qname(buf: &[u8], mut pos: usize) -> Result<(String, usize),
 
         let label = &buf[pos..pos + len as usize];
         let s = String::from_utf8(label.to_vec())
-            .map_err(|_| SCloudException::SCLOUD_QUESTION_DESERIALIZATION_FAILED)?;
+            .map_err(|_| SCloudException::SCLOUD_IMPOSSIBLE_PARSE_QNAME)?;
 
         labels.push(s);
         pos += len as usize;

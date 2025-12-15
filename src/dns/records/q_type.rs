@@ -1,4 +1,3 @@
-// q_type.rs
 
 use crate::exceptions::SCloudException;
 use std::convert::TryFrom;
