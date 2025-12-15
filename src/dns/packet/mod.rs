@@ -6,10 +6,10 @@ use crate::dns::packet::question::QuestionSection;
 use crate::exceptions::SCloudException;
 use std::io::Read;
 
-mod additional;
+pub(crate)mod additional;
 pub(crate) mod answer;
 pub(crate) mod authority;
-pub mod header;
+pub(crate) mod header;
 pub(crate) mod question;
 
 #[derive(Debug, PartialEq)]
@@ -68,18 +68,28 @@ impl DNSPacket {
 
     // TODO: make the others parts of the DNSPacket
     /// Serialize the DNS packet into a byte array
-    pub fn to_bytes(obj: DNSPacket) -> Result<Vec<u8>, SCloudException> {
+    pub fn to_bytes(&self) -> Result<Vec<u8>, SCloudException> {
         let mut bytes = Vec::new();
 
-        bytes.extend_from_slice(&obj.header.to_bytes()?);
-        for q in obj.questions {
+        if let Err(_) = self.header.to_bytes() {
+            return Err(SCloudException::SCLOUD_HEADER_BYTES_EMPTY);
+        }
+        bytes.extend_from_slice(&self.header.to_bytes()?);
+
+        for q in &self.questions {
             bytes.extend_from_slice(&q.to_bytes()?);
         }
-        for ans in obj.answers {
+
+        for ans in &self.answers {
             bytes.extend_from_slice(&ans.to_bytes()?);
         }
-        for auths in obj.authorities {
-            bytes.extend_from_slice(&auths.to_bytes()?);
+
+        for auth in &self.authorities {
+            bytes.extend_from_slice(&auth.to_bytes()?);
+        }
+
+        for add in &self.additionals {
+            bytes.extend_from_slice(&add.to_bytes()?);
         }
 
         Ok(bytes)

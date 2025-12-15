@@ -5,9 +5,8 @@ mod tests {
 
     #[test]
     fn test_exceptions_to_str() {
-        let mut i: usize = 0;
-        let ex_msg_array: [&'static str; 16] = [
-            //HEADER SECTION
+        let ex_msg_array: [&'static str; 19] = [
+            // HEADER SECTION
             "Buffer length is less than header length.",
             "The header is empty.",
             // QUESTION SECTION
@@ -23,6 +22,9 @@ mod tests {
             "Impossible to deserialize, `buf.len()` is lower than `pos+10`. (buf too short)",
             // ADDITIONAL SECTION
             "Buffer length is less than additional section length.",
+            "Impossible to deserialize, `buf.len()` is lower than `pos+10`. (buf too short)",
+            "`q_name` too long.",
+            "Buffer length is less than authority section length.",
             // QNAME
             "Impossible to parse the `q_name`, check if a `q_name` is provided.",
             "Impossible to parse the `q_name`, pos is greater than buffer length.",
@@ -31,14 +33,48 @@ mod tests {
             // QTYPE
             "Unknown `q_type`.",
         ];
+
+        let mut i = 0;
         for ex in SCloudException::iter() {
-            println!(
-                "expected: {:?}\ngot: {}",
-                ex_msg_array[i],
-                SCloudException::to_str(&ex)
-            );
-            assert_eq!(SCloudException::to_str(&ex), ex_msg_array[i]);
+            let msg = ex.to_str();
+            println!("variant: {:?}, msg: {}", ex, msg);
+            assert_eq!(msg, ex_msg_array[i], "Mismatch for variant {:?}", ex);
             i += 1;
+        }
+
+        assert_eq!(i, ex_msg_array.len(), "Number of exceptions mismatch");
+    }
+
+    #[test]
+    fn test_exceptions_debug() {
+        for ex in SCloudException::iter() {
+            let debug_str = format!("{:?}", ex);
+            assert!(!debug_str.is_empty(), "Debug string should not be empty");
+        }
+    }
+
+    #[test]
+    fn test_exceptions_partial_eq() {
+        for ex in SCloudException::iter() {
+            assert_eq!(ex, ex.clone());
+        }
+    }
+
+    #[test]
+    fn test_exceptions_iter_count() {
+        let count = SCloudException::iter().count();
+        assert_eq!(count, 19, "Expected 19 variants of SCloudException");
+    }
+
+    #[test]
+    fn test_all_exceptions_covered() {
+        for ex in SCloudException::iter() {
+            let msg = ex.to_str();
+            assert!(
+                !msg.is_empty(),
+                "to_str() returned empty string for variant {:?}",
+                ex
+            );
         }
     }
 }

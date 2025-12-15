@@ -2,9 +2,8 @@ use strum_macros::EnumIter;
 
 mod tests;
 
-#[derive(Debug)]
 #[allow(non_camel_case_types)]
-#[derive(PartialEq, EnumIter)]
+#[derive(Debug, PartialEq, EnumIter, Clone)]
 pub enum SCloudException {
     // HEADER SECTION
     SCLOUD_HEADER_DESERIALIZATION_FAILED,
@@ -26,6 +25,9 @@ pub enum SCloudException {
 
     // ADDITIONAL SECTION
     SCLOUD_ADDITIONAL_DESERIALIZATION_FAILED,
+    SCLOUD_ADDITIONAL_DESERIALIZATION_FAILED_BUF_TOO_SHORT,
+    SCLOUD_ADDITIONAL_DESERIALIZATION_FAILED_QNAME_TOO_LONG,
+    SCLOUD_ADDITIONAL_DESERIALIZATION_FAILED_RDATA_OUT_OF_BOUNDS,
 
     // QNAME
     SCLOUD_IMPOSSIBLE_PARSE_QNAME,
@@ -80,6 +82,15 @@ impl SCloudException {
             // ADDITIONAL SECTION
             SCloudException::SCLOUD_ADDITIONAL_DESERIALIZATION_FAILED => {
                 "Buffer length is less than additional section length."
+            }
+            SCloudException::SCLOUD_ADDITIONAL_DESERIALIZATION_FAILED_BUF_TOO_SHORT => {
+                "Impossible to deserialize, `buf.len()` is lower than `pos+10`. (buf too short)"
+            }
+            SCloudException::SCLOUD_ADDITIONAL_DESERIALIZATION_FAILED_QNAME_TOO_LONG => {
+                "`q_name` too long."
+            }
+            SCloudException::SCLOUD_ADDITIONAL_DESERIALIZATION_FAILED_RDATA_OUT_OF_BOUNDS => {
+                "Buffer length is less than authority section length."
             }
 
             // QNAME

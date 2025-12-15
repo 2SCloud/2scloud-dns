@@ -5,6 +5,7 @@ mod question;
 
 #[cfg(test)]
 mod tests {
+    use crate::dns::packet::additional::AdditionalSection;
     use crate::dns::packet::DNSPacket;
     use crate::dns::packet::answer::AnswerSection;
     use crate::dns::packet::authority::AuthoritySection;
@@ -21,7 +22,7 @@ mod tests {
             0x00, 0x01, // QDCOUNT = 1
             0x00, 0x01, // ANCOUNT = 1
             0x00, 0x01, // NSCOUNT = 1
-            0x00, 0x00, // ARCOUNT = 0
+            0x00, 0x01, // ARCOUNT = 1
             // ===== QUESTION SECTION =====
             0x04, b'r', b'u', b's', b't', 0x06, b't', b'r', b'e', b'n', b'd', b's', 0x03, b'c',
             b'o', b'm', 0x00, // end of QNAME
@@ -44,6 +45,16 @@ mod tests {
             0x00, 0x10, // RDLENGTH = 16
             0x03, b'n', b's', b'1', 0x06, b't', b'r', b'e', b'n', b'd', b's', 0x03, b'c', b'o',
             b'm', 0x00, // end of NS name
+            // ===== ADDITIONAL SECTION =====
+            0x04, b'r', b'u', b's', b't',
+            0x06, b't', b'r', b'e', b'n', b'd', b's',
+            0x03, b'c', b'o', b'm',
+            0x00,
+            0x00, 0x01, // TYPE
+            0x00, 0x01, // CLASS
+            0x00, 0x00, 0x00, 0x3C, // TTL = 60
+            0x00, 0x04, // RDLENGTH = 4
+            127, 0, 0, 1, // RDATA
         ];
 
         let expected_packet = DNSPacket {
@@ -60,7 +71,7 @@ mod tests {
                 qdcount: 1,
                 ancount: 1,
                 nscount: 1,
-                arcount: 0,
+                arcount: 1,
             },
             questions: vec![QuestionSection {
                 q_name: "rust.trends.com".to_string(),
@@ -82,7 +93,14 @@ mod tests {
                 ttl: 60,
                 ns_name: "ns1.trends.com".to_string(),
             }],
-            additionals: vec![],
+            additionals: vec![AdditionalSection{
+                q_name: "rust.trends.com".to_string(),
+                q_type: DNSRecordType::A,
+                q_class: DNSClass::IN,
+                ttl: 60,
+                rdlength: 4,
+                rdata: vec![127, 0, 0, 1],
+            }],
         };
 
         let result = DNSPacket::from_bytes(bytes).unwrap();
@@ -106,7 +124,7 @@ mod tests {
                 qdcount: 1,
                 ancount: 1,
                 nscount: 1,
-                arcount: 0,
+                arcount: 1,
             },
             questions: vec![QuestionSection {
                 q_name: "rust.trends.com".to_string(),
@@ -128,7 +146,14 @@ mod tests {
                 ttl: 0,
                 ns_name: "ns1.rust.trends.com".to_string(),
             }],
-            additionals: vec![],
+            additionals: vec![AdditionalSection{
+                q_name: "rust.trends.com".to_string(),
+                q_type: DNSRecordType::A,
+                q_class: DNSClass::IN,
+                ttl: 60,
+                rdlength: 4,
+                rdata: vec![127, 0, 0, 1],
+            }],
         };
 
         let expected_bytes: &[u8] = &[
@@ -138,7 +163,7 @@ mod tests {
             0x00, 0x01, // QDCOUNT = 1
             0x00, 0x01, // ANCOUNT = 1
             0x00, 0x01, // NSCOUNT = 1
-            0x00, 0x00, // ARCOUNT = 0
+            0x00, 0x01, // ARCOUNT = 1
             // ===== QUESTION SECTION =====
             0x04, b'r', b'u', b's', b't', // label "rust"
             0x06, b't', b'r', b'e', b'n', b'd', b's', // label "trends"
@@ -170,9 +195,20 @@ mod tests {
             // RDATA = ns1.rust.trends.com
             0x03, b'n', b's', b'1', 0x04, b'r', b'u', b's', b't', 0x06, b't', b'r', b'e', b'n',
             b'd', b's', 0x03, b'c', b'o', b'm', 0x00,
+
+            // ===== ADDITIONAL SECTION =====
+            0x04, b'r', b'u', b's', b't',
+            0x06, b't', b'r', b'e', b'n', b'd', b's',
+            0x03, b'c', b'o', b'm',
+            0x00,
+            0x00, 0x01, // TYPE
+            0x00, 0x01, // CLASS
+            0x00, 0x00, 0x00, 0x3C, // TTL = 60
+            0x00, 0x04, // RDLENGTH = 4
+            127, 0, 0, 1, // RDATA
         ];
 
-        let result = DNSPacket::to_bytes(packet).unwrap();
+        let result = DNSPacket::to_bytes(&packet).unwrap();
 
         println!("expected: {:?}\ngot: {:?}", expected_bytes, result);
         assert_eq!(expected_bytes, result);

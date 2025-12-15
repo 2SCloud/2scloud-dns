@@ -5,10 +5,10 @@ use crate::exceptions::SCloudException;
 
 #[derive(PartialEq, Debug)]
 pub(crate) struct AdditionalSection {
-    q_name: String,
-    q_type: records::DNSRecordType,
-    q_class: DNSClass,
-    ttl: u32,
+    pub(crate) q_name: String,
+    pub(crate) q_type: records::DNSRecordType,
+    pub(crate) q_class: DNSClass,
+    pub(crate) ttl: u32,
     pub rdlength: u16,
     pub rdata: Vec<u8>,
 }
@@ -18,14 +18,14 @@ impl AdditionalSection {
         buf: &[u8],
         offset: usize,
     ) -> Result<(AdditionalSection, usize), SCloudException> {
-        let (q_name, consumed_name) = parse_qname(buf, offset)?;
+        let (q_name, consumed_name) = parse_qname(buf, offset).unwrap();
         let mut pos = consumed_name;
 
         if buf.len() < pos + 10 {
-            return Err(SCloudException::SCLOUD_AUTHORITY_DESERIALIZATION_FAILED_BUF_TOO_SHORT);
+            return Err(SCloudException::SCLOUD_ADDITIONAL_DESERIALIZATION_FAILED_BUF_TOO_SHORT);
         }
 
-        let q_type = DNSRecordType::try_from(u16::from_be_bytes([buf[pos], buf[pos + 1]]))?;
+        let q_type = DNSRecordType::try_from(u16::from_be_bytes([buf[pos], buf[pos + 1]])).unwrap();
         pos += 2;
 
         let q_class = DNSClass::from(u16::from_be_bytes([buf[pos], buf[pos + 1]]));
@@ -39,7 +39,7 @@ impl AdditionalSection {
 
         if buf.len() < pos + rdlength as usize {
             return Err(
-                SCloudException::SCLOUD_AUTHORITY_DESERIALIZATION_FAILED_RDATA_OUT_OF_BOUNDS,
+                SCloudException::SCLOUD_ADDITIONAL_DESERIALIZATION_FAILED_RDATA_OUT_OF_BOUNDS,
             );
         }
 
@@ -59,13 +59,13 @@ impl AdditionalSection {
         ))
     }
 
-    pub(crate) fn to_bytes(&self) -> Vec<u8> {
+    pub(crate) fn to_bytes(&self) -> Result<Vec<u8>, SCloudException> {
         let mut buf: Vec<u8> = Vec::new();
 
         for label in self.q_name.split('.') {
             let len = label.len();
             if len > 63 {
-                panic!("Label too long for DNS: {}", label);
+                return Err(SCloudException::SCLOUD_ADDITIONAL_DESERIALIZATION_FAILED_QNAME_TOO_LONG);
             }
             buf.push(len as u8);
             buf.extend_from_slice(label.as_bytes());
@@ -83,6 +83,6 @@ impl AdditionalSection {
         buf.extend_from_slice(&self.rdlength.to_be_bytes());
         buf.extend_from_slice(&self.rdata);
 
-        buf
+        Ok(buf)
     }
 }

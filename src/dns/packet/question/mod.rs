@@ -41,13 +41,13 @@ impl QuestionSection {
         buf: &[u8],
         offset: usize,
     ) -> Result<(QuestionSection, usize), SCloudException> {
-        let (q_name, mut pos) = parse_qname(buf, offset)?;
+        let (q_name, mut pos) = parse_qname(buf, offset).unwrap();
 
         if buf.len() < pos + 4 {
             return Err(SCloudException::SCLOUD_QUESTION_DESERIALIZATION_FAILED);
         }
 
-        let q_type = DNSRecordType::try_from(u16::from_be_bytes([buf[pos], buf[pos + 1]]))?;
+        let q_type = DNSRecordType::try_from(u16::from_be_bytes([buf[pos], buf[pos + 1]])).unwrap();
 
         let q_class = DNSClass::from(u16::from_be_bytes([buf[pos + 2], buf[pos + 3]]));
 
