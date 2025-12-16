@@ -1,3 +1,5 @@
+use crate::exceptions::SCloudException;
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum DNSClass {
     IN,   // Internet
@@ -6,33 +8,36 @@ pub enum DNSClass {
     HS,   // Hesiod
     NONE, // QCLASS NONE (RFC 2136)
     ANY,  // QCLASS ANY  (RFC 1035)
-    Unknown(u16),
 }
 
-impl From<u16> for DNSClass {
-    fn from(v: u16) -> Self {
+impl TryFrom<u16> for DNSClass {
+    type Error = SCloudException;
+
+    fn try_from(v: u16) -> Result<DNSClass, Self::Error> {
         match v {
-            0 => DNSClass::NONE,
-            1 => DNSClass::IN,
-            2 => DNSClass::CS,
-            3 => DNSClass::CH,
-            4 => DNSClass::HS,
-            255 => DNSClass::ANY,
-            other => DNSClass::Unknown(other),
+            0 => Ok(DNSClass::NONE),
+            1 => Ok(DNSClass::IN),
+            2 => Ok(DNSClass::CS),
+            3 => Ok(DNSClass::CH),
+            4 => Ok(DNSClass::HS),
+            255 => Ok(DNSClass::ANY),
+            _ => Err(SCloudException::SCLOUD_QCLASS_U16_FOR_DNSCLASS_UNKNOWN),
         }
     }
 }
 
-impl From<DNSClass> for u16 {
-    fn from(c: DNSClass) -> u16 {
+impl TryFrom<DNSClass> for u16 {
+    type Error = SCloudException;
+
+    fn try_from(c: DNSClass) -> Result<u16, Self::Error> {
         match c {
-            DNSClass::NONE => 0,
-            DNSClass::IN => 1,
-            DNSClass::CS => 2,
-            DNSClass::CH => 3,
-            DNSClass::HS => 4,
-            DNSClass::ANY => 255,
-            DNSClass::Unknown(v) => v,
+            DNSClass::NONE => Ok(0),
+            DNSClass::IN => Ok(1),
+            DNSClass::CS => Ok(2),
+            DNSClass::CH => Ok(3),
+            DNSClass::HS => Ok(4),
+            DNSClass::ANY => Ok(255),
+            _ => Err(SCloudException::SCLOUD_QCLASS_DNSCLASS_FOR_U16_UNKNOWN),
         }
     }
 }
@@ -40,6 +45,6 @@ impl From<DNSClass> for u16 {
 impl From<&[u8; 2]> for DNSClass {
     fn from(bytes: &[u8; 2]) -> Self {
         let v = u16::from_be_bytes(*bytes);
-        DNSClass::from(v)
+        DNSClass::try_from(v).unwrap()
     }
 }

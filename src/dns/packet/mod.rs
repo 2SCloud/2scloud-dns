@@ -4,9 +4,10 @@ use crate::dns::packet::authority::AuthoritySection;
 use crate::dns::packet::header::Header;
 use crate::dns::packet::question::QuestionSection;
 use crate::exceptions::SCloudException;
+use rand::random;
 use std::io::Read;
 
-pub(crate)mod additional;
+pub(crate) mod additional;
 pub(crate) mod answer;
 pub(crate) mod authority;
 pub(crate) mod header;
@@ -93,5 +94,30 @@ impl DNSPacket {
         }
 
         Ok(bytes)
+    }
+
+    /// Receive a QuestionSection, and return an AnswerSection
+    pub fn new_query(question_section: Vec<QuestionSection>) -> DNSPacket {
+        DNSPacket {
+            header: Header {
+                id: random::<u16>(),
+                qr: false,
+                opcode: 0,
+                aa: false,
+                tc: false,
+                rd: true,
+                ra: false,
+                z: 0,
+                rcode: 0,
+                qdcount: question_section.len() as u16,
+                ancount: 0,
+                nscount: 0,
+                arcount: 0,
+            },
+            questions: question_section,
+            answers: vec![],
+            authorities: vec![],
+            additionals: vec![],
+        }
     }
 }

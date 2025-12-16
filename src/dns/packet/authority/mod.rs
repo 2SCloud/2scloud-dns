@@ -27,7 +27,7 @@ impl AuthoritySection {
         let q_type = DNSRecordType::try_from(u16::from_be_bytes([buf[pos], buf[pos + 1]])).unwrap();
         pos += 2;
 
-        let q_class = DNSClass::from(u16::from_be_bytes([buf[pos], buf[pos + 1]]));
+        let q_class = DNSClass::try_from(u16::from_be_bytes([buf[pos], buf[pos + 1]])).unwrap();
         pos += 2;
 
         let ttl = u32::from_be_bytes([buf[pos], buf[pos + 1], buf[pos + 2], buf[pos + 3]]);
@@ -71,7 +71,7 @@ impl AuthoritySection {
             u16::try_from(self.q_type).expect("Cannot convert AuthoritySection q_type to u16");
         buf.extend_from_slice(&qtype_u16.to_be_bytes());
 
-        let qclass_u16 = u16::from(self.q_class);
+        let qclass_u16 = u16::try_from(self.q_class).unwrap();
         buf.extend_from_slice(&qclass_u16.to_be_bytes());
 
         buf.extend_from_slice(&self.ttl.to_be_bytes());

@@ -28,7 +28,7 @@ impl AdditionalSection {
         let q_type = DNSRecordType::try_from(u16::from_be_bytes([buf[pos], buf[pos + 1]])).unwrap();
         pos += 2;
 
-        let q_class = DNSClass::from(u16::from_be_bytes([buf[pos], buf[pos + 1]]));
+        let q_class = DNSClass::try_from(u16::from_be_bytes([buf[pos], buf[pos + 1]])).unwrap();
         pos += 2;
 
         let ttl = u32::from_be_bytes([buf[pos], buf[pos + 1], buf[pos + 2], buf[pos + 3]]);
@@ -65,7 +65,9 @@ impl AdditionalSection {
         for label in self.q_name.split('.') {
             let len = label.len();
             if len > 63 {
-                return Err(SCloudException::SCLOUD_ADDITIONAL_DESERIALIZATION_FAILED_QNAME_TOO_LONG);
+                return Err(
+                    SCloudException::SCLOUD_ADDITIONAL_DESERIALIZATION_FAILED_QNAME_TOO_LONG,
+                );
             }
             buf.push(len as u8);
             buf.extend_from_slice(label.as_bytes());
@@ -76,7 +78,7 @@ impl AdditionalSection {
             u16::try_from(self.q_type).expect("Cannot convert AdditionalSection q_type to u16");
         buf.extend_from_slice(&qtype_u16.to_be_bytes());
 
-        let qclass_u16 = u16::from(self.q_class);
+        let qclass_u16 = u16::try_from(self.q_class).unwrap();
         buf.extend_from_slice(&qclass_u16.to_be_bytes());
 
         buf.extend_from_slice(&self.ttl.to_be_bytes());

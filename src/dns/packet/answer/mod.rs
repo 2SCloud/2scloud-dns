@@ -32,7 +32,7 @@ impl AnswerSection {
             u16::try_from(self.r_type).expect("Cannot convert AnswerSection q_type to u16");
         buf.extend_from_slice(&rtype_u16.to_be_bytes());
 
-        let rclass_u16 = u16::from(self.r_class);
+        let rclass_u16 = u16::try_from(self.r_class).unwrap();
         buf.extend_from_slice(&rclass_u16.to_be_bytes());
 
         buf.extend_from_slice(&self.ttl.to_be_bytes());
@@ -50,15 +50,13 @@ impl AnswerSection {
         let (q_name, mut pos) = parse_qname(buf, offset).unwrap();
 
         if pos + 10 > buf.len() {
-            return Err(
-                SCloudException::SCLOUD_IMPOSSIBLE_PARSE_ANSWER_HEADER_TOO_SHORT,
-            );
+            return Err(SCloudException::SCLOUD_IMPOSSIBLE_PARSE_ANSWER_HEADER_TOO_SHORT);
         }
 
         let r_type = DNSRecordType::try_from(u16::from_be_bytes([buf[pos], buf[pos + 1]])).unwrap();
         pos += 2;
 
-        let r_class = DNSClass::from(u16::from_be_bytes([buf[pos], buf[pos + 1]]));
+        let r_class = DNSClass::try_from(u16::from_be_bytes([buf[pos], buf[pos + 1]])).unwrap();
         pos += 2;
 
         let ttl = u32::from_be_bytes([buf[pos], buf[pos + 1], buf[pos + 2], buf[pos + 3]]);
@@ -68,9 +66,7 @@ impl AnswerSection {
         pos += 2;
 
         if pos + rdlength as usize > buf.len() {
-            return Err(
-                SCloudException::SCLOUD_IMPOSSIBLE_PARSE_ANSWER_RDATA_OUT_OF_BOUNDS,
-            );
+            return Err(SCloudException::SCLOUD_IMPOSSIBLE_PARSE_ANSWER_RDATA_OUT_OF_BOUNDS);
         }
         let rdata = buf[pos..pos + rdlength as usize].to_vec();
         pos += rdlength as usize;

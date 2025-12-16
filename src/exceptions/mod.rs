@@ -36,7 +36,19 @@ pub enum SCloudException {
     SCLOUD_IMPOSSIBLE_PARSE_QNAME_COMPRESSION_FAILED,
 
     // QTYPE
-    SCLOUD_QTYPE_UNKNOWN_TYPE, //QCLASS
+    SCLOUD_QTYPE_UNKNOWN_TYPE,
+
+    //QCLASS
+    SCLOUD_QCLASS_U16_FOR_DNSCLASS_UNKNOWN,
+    SCLOUD_QCLASS_DNSCLASS_FOR_U16_UNKNOWN,
+
+    // STUB RESOLVER
+    SCLOUD_STUB_RESOLVER_INVALID_DNS_ID,
+    SCLOUD_STUB_RESOLVER_INVALID_DNS_RESPONSE,
+    SCLOUD_STUB_RESOLVER_FAILED_TO_CREATE_SOCKET,
+    SCLOUD_STUB_RESOLVER_FAILED_TO_READ_SOCKET_TIMEOUT,
+    SCLOUD_STUB_RESOLVER_FAILED_TO_SEND_TO_SOCKET,
+    SCLOUD_STUB_RESOLVER_FAILED_TO_RECV_FROM_SOCKET,
 }
 
 impl SCloudException {
@@ -109,6 +121,30 @@ impl SCloudException {
 
             // QTYPE
             SCloudException::SCLOUD_QTYPE_UNKNOWN_TYPE => "Unknown `q_type`.",
+
+            //QCLASS
+            SCloudException::SCLOUD_QCLASS_U16_FOR_DNSCLASS_UNKNOWN => "Unknown `q_class`.",
+            SCloudException::SCLOUD_QCLASS_DNSCLASS_FOR_U16_UNKNOWN => "Unknown `q_class`.",
+
+            // STUB RESOLVER
+            SCloudException::SCLOUD_STUB_RESOLVER_INVALID_DNS_ID => {
+                "[STUB_RESOLVER] Invalid DNS ID (difference between `response.header.id` and `request_id`)."
+            }
+            SCloudException::SCLOUD_STUB_RESOLVER_INVALID_DNS_RESPONSE => {
+                "[STUB_RESOLVER] Invalid DNS response."
+            }
+            SCloudException::SCLOUD_STUB_RESOLVER_FAILED_TO_CREATE_SOCKET => {
+                "[STUB_RESOLVER] Failed to create UDP socket."
+            }
+            SCloudException::SCLOUD_STUB_RESOLVER_FAILED_TO_READ_SOCKET_TIMEOUT => {
+                "[STUB_RESOLVER] Failed to read, socket timeout."
+            }
+            SCloudException::SCLOUD_STUB_RESOLVER_FAILED_TO_SEND_TO_SOCKET => {
+                "[STUB_RESOLVER] Failed to send to socket."
+            }
+            SCloudException::SCLOUD_STUB_RESOLVER_FAILED_TO_RECV_FROM_SOCKET => {
+                "[STUB_RESOLVER] Failed to receive from socket."
+            }
         }
     }
 }

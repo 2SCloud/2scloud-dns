@@ -6,3 +6,4 @@ edition = "2024"
 [dependencies]
 strum = "0.26"
 strum_macros = "0.26"
+rand = "0.9.2"

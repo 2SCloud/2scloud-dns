@@ -1,4 +1,3 @@
-
 use crate::exceptions::SCloudException;
 use std::convert::TryFrom;
 use strum_macros::EnumIter;

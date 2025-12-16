@@ -28,7 +28,7 @@ impl QuestionSection {
 
         let q_type_u16 =
             u16::try_from(self.q_type).expect("Cannot convert QuestionSection q_type to u16");
-        let q_class_u16 = u16::from(self.q_class);
+        let q_class_u16 = u16::try_from(self.q_class).unwrap();
 
         buf.extend_from_slice(&q_type_u16.to_be_bytes());
         buf.extend_from_slice(&q_class_u16.to_be_bytes());
@@ -49,7 +49,7 @@ impl QuestionSection {
 
         let q_type = DNSRecordType::try_from(u16::from_be_bytes([buf[pos], buf[pos + 1]])).unwrap();
 
-        let q_class = DNSClass::from(u16::from_be_bytes([buf[pos + 2], buf[pos + 3]]));
+        let q_class = DNSClass::try_from(u16::from_be_bytes([buf[pos + 2], buf[pos + 3]])).unwrap();
 
         pos += 4;
 

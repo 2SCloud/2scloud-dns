@@ -1,40 +1,22 @@
-use std::net::UdpSocket;
+use crate::dns::packet::DNSPacket;
+use crate::dns::packet::question::QuestionSection;
+use crate::dns::records::{DNSClass, DNSRecordType};
+use crate::dns::resolver::stub::resolver::StubResolver;
+use std::net::AddrParseError;
 
 mod dns;
 mod exceptions;
 mod utils;
 
-fn debug_print_bytes(buf: &[u8]) {
-    for (i, chunk) in buf.chunks(16).enumerate() {
-        print!("{:08x}: ", i * 16);
-        for byte in chunk {
-            print!("{:02x} ", byte);
-        }
-        for _ in 0..(16 - chunk.len()) {
-            print!("   ");
-        }
-        print!("  ");
-        for byte in chunk {
-            if *byte >= 32 && *byte <= 126 {
-                print!("{}", *byte as char);
-            } else {
-                print!(".");
-            }
-        }
-        println!();
-    }
-}
-
 fn main() {
-    let socket = UdpSocket::bind("0.0.0.0:1053").expect("Could not bind to port 1053");
-    let mut buf = [0; 512];
+    let resolver = StubResolver::new("8.8.8.8:53".parse().unwrap());
 
-    println!("DNS server is running at port 1053");
+    let q = vec![QuestionSection {
+        q_name: "example.com".to_string(),
+        q_type: DNSRecordType::A,
+        q_class: DNSClass::IN,
+    }];
 
-    loop {
-        let (len, addr) = socket.recv_from(&mut buf).expect("Could not receive data");
-
-        println!("\nReceived query from {} with length {} bytes", addr, len);
-        debug_print_bytes(&buf[..len]);
-    }
+    let res = resolver.resolve(q);
+    println!("{:#?}", res);
 }
