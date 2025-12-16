@@ -1,4 +1,4 @@
-name: Coverage Report
+name: Coverage & GitHub Pages
 
 on:
   push:
@@ -28,16 +28,16 @@ jobs:
           rustup component add llvm-tools-preview
           cargo install cargo-llvm-cov
 
-      - name: Generate HTML & JSON coverage report
+      - name: Generate coverage
         run: |
           cargo llvm-cov --ignore-filename-regex "main.rs" --json > coverage.json
           cargo llvm-cov --ignore-filename-regex "main.rs" --html
 
-      - name: Build Pages site structure
+      - name: Build Pages site
         run: |
           mkdir -p site/coverage
           cp -r target/llvm-cov/html/* site/coverage/
-
+          
           # Write homepage
           cat > site/index.html << 'EOF'
               <!DOCTYPE html>
@@ -106,3 +106,20 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: site/
+
+  deploy:
+    needs: coverage
+    runs-on: ubuntu-latest
+
+    if: >
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/main'
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
