@@ -11,7 +11,7 @@ fn main() {
     let resolver = StubResolver::new("192.0.0.245:53".parse().unwrap());
 
     let q = vec![QuestionSection {
-        q_name: "example.com".to_string(),
+        q_name: "github.com".to_string(),
         q_type: DNSRecordType::A,
         q_class: DNSClass::IN,
     }];

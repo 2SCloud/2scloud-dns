@@ -9,7 +9,7 @@ pub struct StubResolver {
 }
 
 impl StubResolver {
-    /// Crée un nouveau stub resolver vers le serveur DNS donné
+
     pub fn new(server: std::net::SocketAddr) -> Self {
         Self {
             server,
@@ -18,7 +18,6 @@ impl StubResolver {
         }
     }
 
-    /// Résout une liste de questions DNS et renvoie le paquet réponse
     pub fn resolve(&self, questions: Vec<QuestionSection>) -> Result<DNSPacket, SCloudException> {
         let packet = DNSPacket::new_query(questions);
         let request_id = packet.header.id;
