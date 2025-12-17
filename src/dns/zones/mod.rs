@@ -7,7 +7,7 @@ use std::collections::HashMap;
 pub struct Zone {
     pub origin: Option<String>,
     pub name: String,
-    pub ttl: u16,
+    pub ttl: u32,
     pub soa: Option<DNSRecord>,
     pub records: HashMap<String, Vec<DNSRecord>>,
 }

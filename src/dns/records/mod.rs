@@ -1,13 +1,13 @@
+use crate::dns::q_class::DNSClass;
 use crate::dns::q_type::DNSRecordType;
 
 #[derive(Debug, Clone, PartialEq)]
 pub(crate) struct DNSRecord {
-    pub name: String,         // ex: www, @, blog
-    pub rtype: DNSRecordType, // type of record
-    pub ttl: u32,             // time to live in seconds
-    pub value: String,        // IP, domain, text, target, etc.
-
-    // Optional fields depending on type
+    pub name: String,
+    pub rtype: DNSRecordType,
+    pub rclass: DNSClass,
+    pub ttl: u32,
+    pub value: String,
     pub priority: Option<u16>,       // MX, SRV
     pub weight: Option<u16>,         // SRV
     pub port: Option<u16>,           // SRV
@@ -15,4 +15,6 @@ pub(crate) struct DNSRecord {
     pub tag: Option<String>,         // CAA
     pub regex: Option<String>,       // NAPTR
     pub replacement: Option<String>, // NAPTR
+    pub order: Option<u16>,          // NAPTR
+    pub preference: Option<u16>,     // NAPTR
 }
