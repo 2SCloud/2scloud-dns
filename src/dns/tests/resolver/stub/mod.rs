@@ -59,7 +59,7 @@ mod tests{
                 q_type: DNSRecordType::SOA,
                 q_class: DNSClass::IN,
                 ttl: result.authorities[0].ttl,
-                ns_name: "dns1.p08.nsone.net".to_string(),
+                ns_name: "ns-1707.awsdns-21.co.uk".to_string(),
             }],
             additionals: vec![],
         };
