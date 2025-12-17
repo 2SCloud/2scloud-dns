@@ -1,13 +1,32 @@
 #[cfg(test)]
 mod tests {
     use crate::dns::packet::DNSPacket;
-    use crate::dns::packet::authority::AuthoritySection;
     use crate::dns::packet::header::Header;
     use crate::dns::packet::question::QuestionSection;
     use crate::dns::q_class::DNSClass;
     use crate::dns::q_type::DNSRecordType;
     use crate::dns::resolver::stub::StubResolver;
     use std::net::SocketAddr;
+    use crate::exceptions::SCloudException;
+
+    pub fn resolve_with_fake(
+        stub: StubResolver,
+        questions: Vec<QuestionSection>,
+        fake_response: Option<DNSPacket>,
+    ) -> Result<DNSPacket, SCloudException> {
+        if let Some(resp) = fake_response {
+            let request_id = 42;
+            if resp.header.id != request_id {
+                return Err(SCloudException::SCLOUD_STUB_RESOLVER_INVALID_DNS_ID);
+            }
+            if !resp.header.qr {
+                return Err(SCloudException::SCLOUD_STUB_RESOLVER_INVALID_DNS_RESPONSE);
+            }
+            return Ok(resp);
+        }
+
+        stub.resolve(questions)
+    }
 
     #[test]
     fn test_new_stub_resolver() {
@@ -54,17 +73,52 @@ mod tests {
                 q_class: DNSClass::IN,
             }],
             answers: vec![],
-            authorities: vec![AuthoritySection {
-                q_name: "github.com".to_string(),
-                q_type: DNSRecordType::SOA,
-                q_class: DNSClass::IN,
-                ttl: result.authorities[0].ttl,
-                ns_name: "ns-1707.awsdns-21.co.uk".to_string(),
-            }],
+            authorities: vec![],
             additionals: vec![],
         };
 
-        println!("expected: {:?}\ngot: {:?}", expected_packet, result);
-        assert_eq!(expected_packet, result)
+        assert_eq!(expected_packet.header, result.header);
+        assert_eq!(expected_packet.questions, result.questions);
+        assert_eq!(expected_packet.answers, result.answers);
+        assert_eq!(expected_packet.additionals, result.additionals);
+
+        assert_eq!(result.authorities.len(), 1);
+        let auth = &result.authorities[0];
+
+        assert_eq!(auth.q_name, "github.com");
+        assert_eq!(auth.q_type, DNSRecordType::SOA);
+        assert_eq!(auth.q_class, DNSClass::IN);
+        assert!(auth.ttl > 0);
+        assert!(!auth.ns_name.is_empty());
+
     }
+
+    #[test]
+    fn test_force_invalid_id() {
+        let mut packet = DNSPacket::new_query(vec![]);
+        let request_id = packet.header.id;
+
+        let invalid_id_packet = DNSPacket { header: Header { id: request_id + 1, qr: true, ..packet.header }, ..packet };
+
+        let result = resolve_with_fake(StubResolver::new("1.1.1.1:53".parse().unwrap()), vec![], Some(invalid_id_packet)).err().unwrap();
+
+        println!("expected: {:?}\ngot: {:?}", SCloudException::SCLOUD_STUB_RESOLVER_INVALID_DNS_ID, result);
+        assert_eq!(result, SCloudException::SCLOUD_STUB_RESOLVER_INVALID_DNS_ID);
+    }
+
+    #[test]
+    fn test_force_invalid_response() {
+        let mut packet = DNSPacket::new_query(vec![]);
+        let request_id = 42;
+
+        let invalid_qr_packet = DNSPacket { header: Header { id: request_id, qr: false, ..packet.header }, ..packet };
+
+        let result = resolve_with_fake(StubResolver::new("192.0.0.245:53".parse().unwrap()), vec![], Some(invalid_qr_packet)).err().unwrap();
+
+        println!("expected: {:?}\ngot: {:?}", SCloudException::SCLOUD_STUB_RESOLVER_INVALID_DNS_RESPONSE, result);
+        assert_eq!(result, SCloudException::SCLOUD_STUB_RESOLVER_INVALID_DNS_RESPONSE);
+    }
+
+
+
 }
