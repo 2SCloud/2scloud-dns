@@ -207,17 +207,16 @@ mod tests {
         println!("expected: {:?}\ngot: {:?}", expected_bytes, result);
         assert_eq!(expected_bytes, result);
     }
-    
+
     #[test]
     fn test_new_query() {
-
         let result = DNSPacket::new_query(vec![QuestionSection {
             q_name: "github.com".to_string(),
             q_type: DNSRecordType::A,
             q_class: DNSClass::IN,
         }]);
 
-        let expected_packet: DNSPacket = DNSPacket{
+        let expected_packet: DNSPacket = DNSPacket {
             header: Header {
                 id: result.header.id,
                 qr: false,
@@ -243,12 +242,14 @@ mod tests {
             additionals: vec![],
         };
 
-        println!("expected: {:?}\ngot: {:?}", expected_packet,
-                 DNSPacket::new_query(vec![QuestionSection {
-                     q_name: "github.com".to_string(),
-                     q_type: DNSRecordType::A,
-                     q_class: DNSClass::IN,
-                 }])
+        println!(
+            "expected: {:?}\ngot: {:?}",
+            expected_packet,
+            DNSPacket::new_query(vec![QuestionSection {
+                q_name: "github.com".to_string(),
+                q_type: DNSRecordType::A,
+                q_class: DNSClass::IN,
+            }])
         );
         assert_eq!(expected_packet, result)
     }

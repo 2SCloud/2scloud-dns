@@ -1,19 +1,18 @@
-
 #[cfg(test)]
-mod tests{
-    use std::net::SocketAddr;
-    use crate::dns::packet::authority::AuthoritySection;
+mod tests {
     use crate::dns::packet::DNSPacket;
+    use crate::dns::packet::authority::AuthoritySection;
     use crate::dns::packet::header::Header;
     use crate::dns::packet::question::QuestionSection;
     use crate::dns::q_class::DNSClass;
     use crate::dns::q_type::DNSRecordType;
     use crate::dns::resolver::stub::StubResolver;
+    use std::net::SocketAddr;
 
     #[test]
-    fn test_new_stub_resolver(){
+    fn test_new_stub_resolver() {
         let result = StubResolver::new("1.1.1.1:53".parse().unwrap());
-        let expected = StubResolver{
+        let expected = StubResolver {
             server: SocketAddr::new("1.1.1.1".parse().unwrap(), 53),
             timeout: std::time::Duration::from_secs(5),
             retries: 3,
@@ -30,9 +29,10 @@ mod tests{
                 q_name: "github.com".to_string(),
                 q_type: DNSRecordType::CNAME,
                 q_class: DNSClass::IN,
-            }]).unwrap();
+            }])
+            .unwrap();
 
-        let expected_packet: DNSPacket = DNSPacket{
+        let expected_packet: DNSPacket = DNSPacket {
             header: Header {
                 id: result.header.id,
                 qr: true,
@@ -54,7 +54,7 @@ mod tests{
                 q_class: DNSClass::IN,
             }],
             answers: vec![],
-            authorities: vec![AuthoritySection{
+            authorities: vec![AuthoritySection {
                 q_name: "github.com".to_string(),
                 q_type: DNSRecordType::SOA,
                 q_class: DNSClass::IN,
@@ -67,5 +67,4 @@ mod tests{
         println!("expected: {:?}\ngot: {:?}", expected_packet, result);
         assert_eq!(expected_packet, result)
     }
-
 }
