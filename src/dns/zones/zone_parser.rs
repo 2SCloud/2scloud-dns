@@ -8,7 +8,7 @@ pub(crate) fn zone_parser(qname: &str) -> Result<Zone, SCloudException> {
     let mut zone: Zone = Zone {
         origin: None,
         name: "".to_string(),
-        ttl: 0,
+        ttl: 2500,
         soa: None,
         records: Default::default(),
     };
@@ -22,6 +22,14 @@ pub(crate) fn zone_parser(qname: &str) -> Result<Zone, SCloudException> {
             line.map_err(|_| SCloudException::SCLOUD_ZONE_PARSER_FAILED_TO_READ_ZONE_FILE)?;
         if line.starts_with("$ORIGIN") {
             zone.origin = Some(line.split_whitespace().nth(1).unwrap().to_string());
+        }
+        if line.starts_with("$TTL") {
+            zone.ttl = line
+                .split_whitespace()
+                .nth(1)
+                .unwrap()
+                .parse::<u16>()
+                .map_err(|_| SCloudException::SCLOUD_ZONE_PARSER_FAILED_TO_READ_TTL_FIELD)?;
         }
     }
 

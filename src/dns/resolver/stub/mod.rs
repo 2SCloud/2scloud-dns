@@ -9,7 +9,6 @@ pub struct StubResolver {
 }
 
 impl StubResolver {
-
     pub fn new(server: std::net::SocketAddr) -> Self {
         Self {
             server,

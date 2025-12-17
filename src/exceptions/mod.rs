@@ -54,6 +54,7 @@ pub enum SCloudException {
     SCLOUD_ZONE_PARSER_FILE_NOT_FOUND,
     SCLOUD_ZONE_PARSER_FILE_EMPTY,
     SCLOUD_ZONE_PARSER_FAILED_TO_READ_ZONE_FILE,
+    SCLOUD_ZONE_PARSER_FAILED_TO_READ_TTL_FIELD,
 }
 
 impl SCloudException {
@@ -158,6 +159,9 @@ impl SCloudException {
             SCloudException::SCLOUD_ZONE_PARSER_FILE_EMPTY => "[ZONE_PARSER] Zone file is empty.",
             SCloudException::SCLOUD_ZONE_PARSER_FAILED_TO_READ_ZONE_FILE => {
                 "[ZONE_PARSER] `zone_parser()` failed to read the zone file."
+            }
+            SCloudException::SCLOUD_ZONE_PARSER_FAILED_TO_READ_TTL_FIELD => {
+                "[ZONE_PARSER] `zone_parser()` detect TTL field but failed to read this field."
             }
         }
     }

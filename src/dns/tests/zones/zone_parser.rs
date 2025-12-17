@@ -9,7 +9,7 @@ mod tests {
         let expected_zone: Zone = Zone {
             origin: Some("nihilist.moe.".to_string()),
             name: "".to_string(),
-            ttl: 0,
+            ttl: 3600,
             soa: None,
             records: Default::default(),
         };
