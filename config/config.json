@@ -1,0 +1,317 @@
+{
+  "server": {
+    "name": "2scloud-dns",
+    "environment": "production",
+    "workers": 8,
+    "max_concurrent_requests": 5000,
+    "graceful_shutdown_timeout_secs": 15,
+    "default_ttl": 3600,
+    "max_udp_payload": 4096,
+    "enable_edns": true,
+    "enable_tcp": true,
+    "enable_dnssec": false,
+    "bind_port": 53
+  },
+  "logging": {
+    "level": "info",
+    "format": "json",
+    "file": "/var/log/2scloud-dns/2scloud-dns.log",
+    "rotate": true,
+    "max_size_mb": 200
+  },
+  "metrics": {
+    "enabled": true,
+    "prometheus_bind": "0.0.0.0:9153",
+    "enable_health_endpoint": true,
+    "health_bind": "127.0.0.1:8081"
+  },
+  "admin": {
+    "enabled": true,
+    "bind": "127.0.0.1:8053",
+    "auth_token": "replace-with-secure-token",
+    "enable_tls": false
+  },
+  "acl": [
+    {
+      "name": "localhost",
+      "networks": [
+        "127.0.0.0/8",
+        "::1/128"
+      ]
+    },
+    {
+      "name": "internal",
+      "networks": [
+        "10.0.0.0/8",
+        "192.168.0.0/16"
+      ]
+    },
+    {
+      "name": "trusted-remote",
+      "networks": [
+        "203.0.113.0/24"
+      ]
+    }
+  ],
+  "listener": [
+    {
+      "name": "public-udp",
+      "address": "0.0.0.0",
+      "port": 53,
+      "protocols": [
+        "udp"
+      ],
+      "recursion_allowed": false,
+      "acl": "0.0.0.0/0",
+      "workers": 4
+    },
+    {
+      "name": "internal-resolver",
+      "address": "10.0.0.1",
+      "port": 53,
+      "protocols": [
+        "udp",
+        "tcp"
+      ],
+      "recursion_allowed": true,
+      "acl": "internal",
+      "workers": 2
+    },
+    {
+      "name": "dot",
+      "address": "0.0.0.0",
+      "port": 853,
+      "protocols": [
+        "tcp"
+      ],
+      "enable_tls": true,
+      "tls_cert_path": "/etc/2scloud/certs/dot.crt",
+      "tls_key_path": "/etc/2scloud/certs/dot.key",
+      "recursion_allowed": false,
+      "acl": "trusted-remote"
+    }
+  ],
+  "doh": {
+    "enabled": true,
+    "bind": "0.0.0.0:443",
+    "tls_cert_path": "/etc/2scloud/certs/doh.crt",
+    "tls_key_path": "/etc/2scloud/certs/doh.key",
+    "paths": [
+      "/dns-query"
+    ],
+    "allowed_origins": [
+      "https://console.2scloud.example"
+    ]
+  },
+  "forwarder": [
+    {
+      "name": "google",
+      "addresses": [
+        "8.8.8.8:53",
+        "8.8.4.4:53"
+      ],
+      "policy": "round_robin",
+      "timeout_ms": 1500,
+      "edns": true,
+      "use_tcp_on_retry": true
+    },
+    {
+      "name": "cloudflare",
+      "addresses": [
+        "1.1.1.1:53",
+        "1.0.0.1:53"
+      ],
+      "policy": "first",
+      "timeout_ms": 1000,
+      "edns": true
+    }
+  ],
+  "root_hints": {
+    "file": "/etc/2scloud/root.hints"
+  },
+  "cache": {
+    "enabled": true,
+    "max_entries": 200000,
+    "max_ttl_seconds": 86400,
+    "negative_ttl_seconds": 300,
+    "eviction_policy": "lru"
+  },
+  "recursion": {
+    "enabled": true,
+    "allowed_acl": "internal",
+    "max_recursive_queries": 50,
+    "recursion_timeout_ms": 5000,
+    "retry_interval_ms": 200
+  },
+  "ratelimit": {
+    "enabled": true,
+    "global_qps": 3000,
+    "per_ip_qps": 100,
+    "per_subnet_qps": 1000,
+    "rrl": {
+      "enabled": true,
+      "window_seconds": 5,
+      "slip": 2,
+      "qps_threshold": 50
+    }
+  },
+  "zone": [
+    {
+      "name": "example.com.",
+      "type": "master",
+      "file": "/etc/2scloud/zones/example.com.zone",
+      "notify": true,
+      "notify_acl": "trusted-remote",
+      "allow_transfer_acl": "trusted-remote",
+      "allow_update_acl": "",
+      "axfr_tsig_key": "axfr-key"
+    },
+    {
+      "name": "example.org.",
+      "type": "slave",
+      "masters": [
+        "198.51.100.53:53"
+      ],
+      "file": "/var/lib/2scloud/zones/example.org.zone",
+      "allow_transfer_acl": "internal"
+    },
+    {
+      "name": "inline.local.",
+      "type": "master",
+      "inline": true,
+      "notify": false,
+      "records": [
+        {
+          "name": "@",
+          "ttl": 3600,
+          "class": "IN",
+          "type": "SOA",
+          "rdata": "ns1.inline.local. hostmaster.inline.local. 2025121101 7200 3600 1209600 3600"
+        },
+        {
+          "name": "@",
+          "ttl": 3600,
+          "class": "IN",
+          "type": "NS",
+          "rdata": "ns1.inline.local."
+        },
+        {
+          "name": "@",
+          "ttl": 3600,
+          "class": "IN",
+          "type": "A",
+          "rdata": "10.0.0.10"
+        },
+        {
+          "name": "www",
+          "ttl": 300,
+          "class": "IN",
+          "type": "A",
+          "rdata": "10.0.0.11"
+        },
+        {
+          "name": "mail",
+          "ttl": 3600,
+          "class": "IN",
+          "type": "MX",
+          "priority": 10,
+          "rdata": "mail.inline.local."
+        },
+        {
+          "name": "_acme-challenge",
+          "ttl": 60,
+          "class": "IN",
+          "type": "TXT",
+          "rdata": "\"acme-challenge-token-example\""
+        }
+      ]
+    },
+    {
+      "name": "private.example.",
+      "type": "forward",
+      "forwarders": [
+        "10.10.10.2:5353"
+      ],
+      "forward_policy": "first"
+    }
+  ],
+  "tsig_key": [
+    {
+      "name": "axfr-key",
+      "algorithm": "hmac-sha256",
+      "secret": "REPLACE_WITH_BASE64_SECRET=="
+    },
+    {
+      "name": "dyn-update-key",
+      "algorithm": "hmac-sha256",
+      "secret": "ANOTHER_BASE64_SECRET=="
+    }
+  ],
+  "axfr": {
+    "enabled": true,
+    "max_concurrent_transfers": 4,
+    "transfer_timeout_secs": 120
+  },
+  "dnssec": {
+    "enabled": false,
+    "auto_sign": false,
+    "default_algo": "RSASHA256",
+    "kasp_file": "/etc/2scloud/dnssec/kasp.json"
+  },
+  "policy": {
+    "deny_domains": [
+      "bad.example",
+      "ads.example"
+    ]
+  },
+  "amplification_mitigation": {
+    "drop_fragments": true,
+    "max_response_size_udp": 4096
+  },
+  "tuning": {
+    "socket_recv_buffer_bytes": 262144,
+    "socket_send_buffer_bytes": 262144,
+    "max_label_length": 63,
+    "max_domain_length": 253
+  },
+  "view": [
+    {
+      "name": "internal-view",
+      "acl": "internal",
+      "zones": [
+        {
+          "name": "example.com.",
+          "file": "/etc/2scloud/zones/example.com.internal.zone"
+        }
+      ]
+    },
+    {
+      "name": "external-view",
+      "acl": "0.0.0.0/0",
+      "zones": [
+        {
+          "name": "example.com.",
+          "file": "/etc/2scloud/zones/example.com.zone"
+        }
+      ]
+    }
+  ],
+  "monitoring": {
+    "enable_query_logging": false,
+    "query_log_path": "/var/log/2scloud-dns/queries.log",
+    "log_query_qps": 1000
+  },
+  "dynupdate": [
+    {
+      "zone": "inline.local.",
+      "acl": "internal",
+      "tsig_key": "dyn-update-key",
+      "allow": true
+    }
+  ],
+  "limits": {
+    "max_udp_packet_size": 4096,
+    "max_queries_per_minute_per_ip": 1000,
+    "max_tcp_sessions_per_ip": 8
+  }
+}

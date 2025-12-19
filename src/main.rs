@@ -6,6 +6,7 @@ use crate::dns::resolver::stub::StubResolver;
 mod dns;
 mod exceptions;
 mod utils;
+mod config;
 
 fn main() {
     let resolver = StubResolver::new("192.0.0.245:53".parse().unwrap());
