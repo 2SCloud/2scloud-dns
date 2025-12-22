@@ -1,14 +1,14 @@
 <h1 align="center">2SCloud DNS</h1>
 
 <p align="center">
-  <a href="https://2scloud.github.io/2scloud-dns/coverage/">
-    <img src="https://img.shields.io/endpoint?url=https://2scloud.github.io/2scloud-dns/coverage_badge.json" alt="Coverage">
+  <a href="https://2scloud.github.io/scloud-dns/coverage/">
+    <img src="https://img.shields.io/endpoint?url=https://2scloud.github.io/scloud-dns/coverage_badge.json" alt="Coverage">
   </a>
-  <a href="https://github.com/2SCloud/2scloud-dns/actions">
-    <img src="https://img.shields.io/github/actions/workflow/status/2SCloud/2scloud-dns/coverage.yml?branch=main" alt="Build Status">
+  <a href="https://github.com/2SCloud/scloud-dns/actions">
+    <img src="https://img.shields.io/github/actions/workflow/status/2SCloud/scloud-dns/coverage.yml?branch=main" alt="Build Status">
   </a>
-  <a href="https://github.com/2SCloud/2scloud-dns/issues">
-    <img src="https://img.shields.io/github/issues/2SCloud/2scloud-dns" alt="Issues">
+  <a href="https://github.com/2SCloud/scloud-dns/issues">
+    <img src="https://img.shields.io/github/issues/2SCloud/scloud-dns" alt="Issues">
   </a>
   <a href="LICENSE">
     <img src="https://img.shields.io/badge/LICENSE-MIT_(Non_Commercial)-blue" alt="License">
@@ -31,12 +31,12 @@
 Clone the project and build with Cargo:
 
 ```bash
-git clone https://github.com/2SCloud/2scloud-dns.git
+git clone https://github.com/2SCloud/scloud-dns.git
 cd 2scloud-dns
 cargo build --release
 ```
 
-The compiled binary will be located in `target/release/2scloud-dns`.
+The compiled binary will be located in `target/release/scloud-dns`.
 
 ---
 
@@ -45,7 +45,7 @@ The compiled binary will be located in `target/release/2scloud-dns`.
 Example to run the application and query a DNS server:
 
 ```bash
-./target/release/2scloud-dns --server 8.8.8.8 --query example.com A
+./target/release/scloud-dns --server 8.8.8.8 --query example.com A
 ```
 
 Main options:
@@ -64,7 +64,7 @@ The application includes unit tests:
 cargo test
 ```
 
-To see test coverage, check https://2scloud.github.io/2scloud-dns/coverage.
+To see test coverage, check https://2scloud.github.io/scloud-dns/coverage.
 
 ---
 
