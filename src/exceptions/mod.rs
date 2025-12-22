@@ -55,6 +55,10 @@ pub enum SCloudException {
     SCLOUD_ZONE_PARSER_FILE_EMPTY,
     SCLOUD_ZONE_PARSER_FAILED_TO_READ_ZONE_FILE,
     SCLOUD_ZONE_PARSER_FAILED_TO_READ_TTL_FIELD,
+
+    // CONFIG
+    SCLOUD_CONFIG_FILE_NOT_FOUND,
+    SCLOUD_CONFIG_IMPOSSIBLE_TO_PARSE_JSON,
 }
 
 impl SCloudException {
@@ -162,6 +166,14 @@ impl SCloudException {
             }
             SCloudException::SCLOUD_ZONE_PARSER_FAILED_TO_READ_TTL_FIELD => {
                 "[ZONE_PARSER] `zone_parser()` detect TTL field but failed to read this field."
+            }
+
+            //CONFIG
+            SCloudException::SCLOUD_CONFIG_FILE_NOT_FOUND => {
+                "[SCLOUD_CONFIG] Configuration file not found."
+            }
+            SCloudException::SCLOUD_CONFIG_IMPOSSIBLE_TO_PARSE_JSON => {
+                "[SCLOUD_CONFIG] Error while parsing the JSON file."
             }
         }
     }

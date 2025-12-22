@@ -8,6 +8,7 @@ use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::Path;
+use crate::exceptions::SCloudException;
 
 /// Top-level configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -84,11 +85,11 @@ pub struct Config {
 
 impl Config {
     /// Load config from a JSON file path
-    pub fn from_file(path: &Path) -> Result<Self> {
+    pub fn from_file(path: &Path) -> Result<Self, SCloudException> {
         let s = fs::read_to_string(path)
-            .with_context(|| format!("reading config file {}", path.display()))?;
-        let cfg: Config = serde_json::from_str(&s).context("parsing JSON config")?;
-        cfg.validate()?;
+            .with_context(|| format!("reading config file {}", path.display())).map_err(|_| SCloudException::SCLOUD_CONFIG_FILE_NOT_FOUND);
+        let cfg: Config = serde_json::from_str(&s.unwrap()).context("parsing JSON config").map_err(|_| SCloudException::SCLOUD_CONFIG_IMPOSSIBLE_TO_PARSE_JSON)?;
+        // cfg.validate()?;
         Ok(cfg)
     }
 

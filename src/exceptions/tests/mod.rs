@@ -5,7 +5,7 @@ mod tests {
 
     #[test]
     fn test_exceptions_to_str() {
-        let ex_msg_array: [&'static str; 31] = [
+        let ex_msg_array: [&'static str; 33] = [
             // HEADER SECTION
             "Buffer length is less than header length.",
             "The header is empty.",
@@ -47,6 +47,9 @@ mod tests {
             "[ZONE_PARSER] Zone file is empty.",
             "[ZONE_PARSER] `zone_parser()` failed to read the zone file.",
             "[ZONE_PARSER] `zone_parser()` detect TTL field but failed to read this field.",
+            // CONFIG
+            "[SCLOUD_CONFIG] Configuration file not found.",
+            "[SCLOUD_CONFIG] Error while parsing the JSON file.",
         ];
 
         let mut i = 0;

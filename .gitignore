@@ -3,4 +3,4 @@
 coverage.json
 
 # resolver tests
-/src/dns/tests/resolver/stub
+src/dns/tests/resolver/stub/
