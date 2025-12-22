@@ -12,7 +12,7 @@ mod config;
 
 fn main() {
     let config = Config::from_file(Path::new("./config/config.json")).unwrap();
-    let resolver = StubResolver::new(config.forwarder.get(2).unwrap().addresses.get(0).unwrap().parse().unwrap());
+    let resolver = StubResolver::new(config.forwarder.get(1).unwrap().addresses.get(0).unwrap().parse().unwrap());
     println!("{} server is running on port {}...",
              config.server.name,
              config.server.bind_port,
