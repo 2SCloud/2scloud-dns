@@ -46,11 +46,11 @@ impl StubResolver {
                     let response = DNSPacket::from_bytes(&buf[..size])?;
 
                     if response.header.id != request_id {
-                        return Err(SCloudException::SCLOUD_STUB_RESOLVER_INVALID_DNS_ID);
+                        return Err(SCloudException::SCLOUD_STUB_RESOLVER_INVALID_DNS_ID)?;
                     }
 
                     if !response.header.qr {
-                        return Err(SCloudException::SCLOUD_STUB_RESOLVER_INVALID_DNS_RESPONSE);
+                        return Err(SCloudException::SCLOUD_STUB_RESOLVER_INVALID_DNS_RESPONSE)?;
                     }
 
                     return Ok(response);
