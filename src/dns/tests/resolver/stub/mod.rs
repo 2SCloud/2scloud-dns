@@ -46,7 +46,8 @@ mod tests {
 
     #[test]
     fn test_stub_resolve() {
-        let result = StubResolver::new("192.0.0.245:53".parse().unwrap())
+        let config = Config::from_file(Path::new("./config/config.json")).unwrap();
+        let result = StubResolver::new(config.forwarder.get(2).unwrap().addresses.get(0).unwrap().parse().unwrap())
             .resolve(vec![QuestionSection {
                 q_name: "github.com".to_string(),
                 q_type: DNSRecordType::CNAME,
