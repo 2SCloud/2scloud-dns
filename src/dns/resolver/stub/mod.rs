@@ -1,3 +1,5 @@
+use std::path::Path;
+use crate::config::Config;
 use crate::dns::packet::DNSPacket;
 use crate::dns::packet::question::QuestionSection;
 use crate::exceptions::SCloudException;
@@ -11,9 +13,10 @@ pub struct StubResolver {
 
 impl StubResolver {
     pub fn new(server: std::net::SocketAddr) -> Self {
+        let config = Config::from_file(Path::new("./config/config.json")).unwrap();
         Self {
             server,
-            timeout: std::time::Duration::from_secs(5),
+            timeout: std::time::Duration::from_secs(config.server.graceful_shutdown_timeout_secs),
             retries: 3,
         }
     }

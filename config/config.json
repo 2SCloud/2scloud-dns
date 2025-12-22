@@ -124,6 +124,13 @@
       "policy": "first",
       "timeout_ms": 1000,
       "edns": true
+    },
+    {
+      "name": "sta-internal",
+      "addresses": ["192.0.0.245:53"],
+      "policy": "first",
+      "timeout_ms": 5000,
+      "edns": true
     }
   ],
   "root_hints": {

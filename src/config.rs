@@ -264,8 +264,6 @@ pub struct ListenerConfig {
     pub acl: String,
     #[serde(default)]
     pub workers: Option<usize>,
-
-    // TLS-related (optional)
     #[serde(default)]
     pub enable_tls: Option<bool>,
     #[serde(default)]
@@ -280,7 +278,7 @@ impl Default for ListenerConfig {
             name: String::new(),
             address: "0.0.0.0".to_string(),
             port: 53,
-            protocols: vec![Protocol::Udp],
+            protocols: vec![Protocol::UDP],
             recursion_allowed: false,
             acl: "0.0.0.0/0".to_string(),
             workers: None,
@@ -294,8 +292,8 @@ impl Default for ListenerConfig {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum Protocol {
-    Udp,
-    Tcp,
+    UDP,
+    TCP
 }
 
 /* ---------------------------
@@ -358,6 +356,7 @@ impl Default for ForwarderConfig {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
+#[derive(PartialEq)]
 pub enum ForwardPolicy {
     RoundRobin,
     First,
@@ -532,6 +531,7 @@ impl Default for ZoneConfig {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
+#[derive(PartialEq)]
 pub enum ZoneType {
     Master,
     Slave,
