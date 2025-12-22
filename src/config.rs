@@ -1,4 +1,4 @@
-//! Configuration types for 2scloud-dns
+//! Configuration types for scloud-dns
 //!
 //! This file contains Serde (Deserialize/Serialize) structs that map to the
 //! JSON configuration you provided. It includes helpers to load the config
@@ -158,7 +158,7 @@ pub struct ServerConfig {
 impl Default for ServerConfig {
     fn default() -> Self {
         ServerConfig {
-            name: "2scloud-dns".to_string(),
+            name: "scloud-dns".to_string(),
             environment: "production".to_string(),
             workers: 8,
             max_concurrent_requests: 5000,
@@ -191,7 +191,7 @@ impl Default for LoggingConfig {
         LoggingConfig {
             level: "info".to_string(),
             format: "json".to_string(),
-            file: "/var/log/2scloud-dns/2scloud-dns.log".to_string(),
+            file: "/var/log/scloud-dns/scloud-dns.log".to_string(),
             rotate: true,
             max_size_mb: 200,
         }
@@ -375,7 +375,7 @@ pub struct RootHintsConfig {
 impl Default for RootHintsConfig {
     fn default() -> Self {
         RootHintsConfig {
-            file: "/etc/2scloud/root.hints".to_string(),
+            file: "/etc/scloud/root.hints".to_string(),
         }
     }
 }
@@ -683,7 +683,7 @@ impl Default for MonitoringConfig {
     fn default() -> Self {
         MonitoringConfig {
             enable_query_logging: false,
-            query_log_path: "/var/log/2scloud-dns/queries.log".to_string(),
+            query_log_path: "/var/log/scloud-dns/queries.log".to_string(),
             log_query_qps: 1000,
         }
     }

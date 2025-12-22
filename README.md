@@ -16,7 +16,7 @@
 </p>
 
 
-`2scloud-dns` is a Rust application for managing and querying DNS servers. It allows you to build and send DNS queries, analyze responses, and view DNS records conveniently.
+`scloud-dns` is a Rust application for managing and querying DNS servers. It allows you to build and send DNS queries, analyze responses, and view DNS records conveniently.
 
 ## Features
 
@@ -32,7 +32,7 @@ Clone the project and build with Cargo:
 
 ```bash
 git clone https://github.com/2SCloud/scloud-dns.git
-cd 2scloud-dns
+cd scloud-dns
 cargo build --release
 ```
 

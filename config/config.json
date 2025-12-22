@@ -1,6 +1,6 @@
 {
   "server": {
-    "name": "2scloud-dns",
+    "name": "scloud-dns",
     "environment": "production",
     "workers": 8,
     "max_concurrent_requests": 5000,
@@ -15,7 +15,7 @@
   "logging": {
     "level": "info",
     "format": "json",
-    "file": "/var/log/2scloud-dns/2scloud-dns.log",
+    "file": "/var/log/scloud-dns/scloud-dns.log",
     "rotate": true,
     "max_size_mb": 200
   },
@@ -85,8 +85,8 @@
         "tcp"
       ],
       "enable_tls": true,
-      "tls_cert_path": "/etc/2scloud/certs/dot.crt",
-      "tls_key_path": "/etc/2scloud/certs/dot.key",
+      "tls_cert_path": "/etc/scloud/certs/dot.crt",
+      "tls_key_path": "/etc/scloud/certs/dot.key",
       "recursion_allowed": false,
       "acl": "trusted-remote"
     }
@@ -94,13 +94,13 @@
   "doh": {
     "enabled": true,
     "bind": "0.0.0.0:443",
-    "tls_cert_path": "/etc/2scloud/certs/doh.crt",
-    "tls_key_path": "/etc/2scloud/certs/doh.key",
+    "tls_cert_path": "/etc/scloud/certs/doh.crt",
+    "tls_key_path": "/etc/scloud/certs/doh.key",
     "paths": [
       "/dns-query"
     ],
     "allowed_origins": [
-      "https://console.2scloud.example"
+      "https://console.scloud.example"
     ]
   },
   "forwarder": [
@@ -134,7 +134,7 @@
     }
   ],
   "root_hints": {
-    "file": "/etc/2scloud/root.hints"
+    "file": "/etc/scloud/root.hints"
   },
   "cache": {
     "enabled": true,
@@ -166,7 +166,7 @@
     {
       "name": "example.com.",
       "type": "master",
-      "file": "/etc/2scloud/zones/example.com.zone",
+      "file": "/etc/scloud/zones/example.com.zone",
       "notify": true,
       "notify_acl": "trusted-remote",
       "allow_transfer_acl": "trusted-remote",
@@ -179,7 +179,7 @@
       "masters": [
         "198.51.100.53:53"
       ],
-      "file": "/var/lib/2scloud/zones/example.org.zone",
+      "file": "/var/lib/scloud/zones/example.org.zone",
       "allow_transfer_acl": "internal"
     },
     {
@@ -263,7 +263,7 @@
     "enabled": false,
     "auto_sign": false,
     "default_algo": "RSASHA256",
-    "kasp_file": "/etc/2scloud/dnssec/kasp.json"
+    "kasp_file": "/etc/scloud/dnssec/kasp.json"
   },
   "policy": {
     "deny_domains": [
@@ -288,7 +288,7 @@
       "zones": [
         {
           "name": "example.com.",
-          "file": "/etc/2scloud/zones/example.com.internal.zone"
+          "file": "/etc/scloud/zones/example.com.internal.zone"
         }
       ]
     },
@@ -298,14 +298,14 @@
       "zones": [
         {
           "name": "example.com.",
-          "file": "/etc/2scloud/zones/example.com.zone"
+          "file": "/etc/scloud/zones/example.com.zone"
         }
       ]
     }
   ],
   "monitoring": {
     "enable_query_logging": false,
-    "query_log_path": "/var/log/2scloud-dns/queries.log",
+    "query_log_path": "/var/log/scloud-dns/queries.log",
     "log_query_qps": 1000
   },
   "dynupdate": [

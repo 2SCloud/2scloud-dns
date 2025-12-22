@@ -44,7 +44,7 @@ jobs:
               <html lang="en">
               <head>
               <meta charset="UTF-8" />
-              <title>2scloud-dns Coverage</title>
+              <title>scloud-dns Coverage</title>
               <style>
               body {
             font-family: Arial, sans-serif;
@@ -67,7 +67,7 @@ jobs:
               </style>
               </head>
               <body>
-              <h1>2scloud-dns – Coverage Reports</h1>
+              <h1>scloud-dns – Coverage Reports</h1>
               <p>This site hosts automated code coverage reports generated on every push to <code>main</code>.</p>
             
               <p><strong>Latest Coverage:</strong></p>

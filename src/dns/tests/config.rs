@@ -7,7 +7,7 @@ use crate::config::{AxfrConfig, CacheConfig, Config, DnssecConfig, DohConfig, Fo
 fn test_default_config() {
     let cfg = Config::default();
 
-    assert_eq!(cfg.server.name, "2scloud-dns");
+    assert_eq!(cfg.server.name, "scloud-dns");
     assert!(cfg.acl.is_empty());
     assert!(cfg.listener.is_empty());
     assert!(cfg.zone.is_empty());
@@ -41,7 +41,7 @@ fn test_load_from_file() {
 #[test]
 fn test_server_config_defaults() {
     let server = ServerConfig::default();
-    assert_eq!(server.name, "2scloud-dns");
+    assert_eq!(server.name, "scloud-dns");
     assert_eq!(server.environment, "production");
     assert_eq!(server.bind_port, 53);
     assert!(server.enable_tcp);
