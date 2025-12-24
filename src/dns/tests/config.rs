@@ -1,7 +1,11 @@
-use tempfile::NamedTempFile;
+use crate::config::{
+    AxfrConfig, CacheConfig, Config, DnssecConfig, DohConfig, ForwardPolicy, ForwarderConfig,
+    LimitsConfig, ListenerConfig, Protocol, RateLimitConfig, RecursionConfig, ServerConfig,
+    ZoneConfig, ZoneType,
+};
 use serde_json;
 use std::io::Write;
-use crate::config::{AxfrConfig, CacheConfig, Config, DnssecConfig, DohConfig, ForwardPolicy, ForwarderConfig, LimitsConfig, ListenerConfig, Protocol, RateLimitConfig, RecursionConfig, ServerConfig, ZoneConfig, ZoneType};
+use tempfile::NamedTempFile;
 
 #[test]
 fn test_default_config() {

@@ -1,15 +1,15 @@
 #[cfg(test)]
 mod tests {
+    use crate::config::Config;
     use crate::dns::packet::DNSPacket;
     use crate::dns::packet::header::Header;
     use crate::dns::packet::question::QuestionSection;
     use crate::dns::q_class::DNSClass;
     use crate::dns::q_type::DNSRecordType;
     use crate::dns::resolver::stub::StubResolver;
+    use crate::exceptions::SCloudException;
     use std::net::SocketAddr;
     use std::path::Path;
-    use crate::config::Config;
-    use crate::exceptions::SCloudException;
 
     pub fn resolve_with_fake(
         stub: StubResolver,
@@ -47,13 +47,23 @@ mod tests {
     #[test]
     fn test_stub_resolve() {
         let config = Config::from_file(Path::new("./config/config.json")).unwrap();
-        let result = StubResolver::new(config.forwarder.get(1).unwrap().addresses.get(0).unwrap().parse().unwrap())
-            .resolve(vec![QuestionSection {
-                q_name: "github.com".to_string(),
-                q_type: DNSRecordType::CNAME,
-                q_class: DNSClass::IN,
-            }])
-            .unwrap();
+        let result = StubResolver::new(
+            config
+                .forwarder
+                .get(1)
+                .unwrap()
+                .addresses
+                .get(0)
+                .unwrap()
+                .parse()
+                .unwrap(),
+        )
+        .resolve(vec![QuestionSection {
+            q_name: "github.com".to_string(),
+            q_type: DNSRecordType::CNAME,
+            q_class: DNSClass::IN,
+        }])
+        .unwrap();
 
         let expected_packet: DNSPacket = DNSPacket {
             header: Header {
@@ -94,7 +104,6 @@ mod tests {
         assert_eq!(auth.q_class, DNSClass::IN);
         assert!(auth.ttl > 0);
         assert!(!auth.ns_name.is_empty());
-
     }
 
     #[test]
@@ -102,11 +111,28 @@ mod tests {
         let mut packet = DNSPacket::new_query(vec![]);
         let request_id = packet.header.id;
 
-        let invalid_id_packet = DNSPacket { header: Header { id: request_id + 1, qr: true, ..packet.header }, ..packet };
+        let invalid_id_packet = DNSPacket {
+            header: Header {
+                id: request_id + 1,
+                qr: true,
+                ..packet.header
+            },
+            ..packet
+        };
 
-        let result = resolve_with_fake(StubResolver::new("1.1.1.1:53".parse().unwrap()), vec![], Some(invalid_id_packet)).err().unwrap();
+        let result = resolve_with_fake(
+            StubResolver::new("1.1.1.1:53".parse().unwrap()),
+            vec![],
+            Some(invalid_id_packet),
+        )
+        .err()
+        .unwrap();
 
-        println!("expected: {:?}\ngot: {:?}", SCloudException::SCLOUD_STUB_RESOLVER_INVALID_DNS_ID, result);
+        println!(
+            "expected: {:?}\ngot: {:?}",
+            SCloudException::SCLOUD_STUB_RESOLVER_INVALID_DNS_ID,
+            result
+        );
         assert_eq!(result, SCloudException::SCLOUD_STUB_RESOLVER_INVALID_DNS_ID);
     }
 
@@ -115,14 +141,31 @@ mod tests {
         let mut packet = DNSPacket::new_query(vec![]);
         let request_id = 42;
 
-        let invalid_qr_packet = DNSPacket { header: Header { id: request_id, qr: false, ..packet.header }, ..packet };
+        let invalid_qr_packet = DNSPacket {
+            header: Header {
+                id: request_id,
+                qr: false,
+                ..packet.header
+            },
+            ..packet
+        };
 
-        let result = resolve_with_fake(StubResolver::new("192.0.0.245:53".parse().unwrap()), vec![], Some(invalid_qr_packet)).err().unwrap();
+        let result = resolve_with_fake(
+            StubResolver::new("192.0.0.245:53".parse().unwrap()),
+            vec![],
+            Some(invalid_qr_packet),
+        )
+        .err()
+        .unwrap();
 
-        println!("expected: {:?}\ngot: {:?}", SCloudException::SCLOUD_STUB_RESOLVER_INVALID_DNS_RESPONSE, result);
-        assert_eq!(result, SCloudException::SCLOUD_STUB_RESOLVER_INVALID_DNS_RESPONSE);
+        println!(
+            "expected: {:?}\ngot: {:?}",
+            SCloudException::SCLOUD_STUB_RESOLVER_INVALID_DNS_RESPONSE,
+            result
+        );
+        assert_eq!(
+            result,
+            SCloudException::SCLOUD_STUB_RESOLVER_INVALID_DNS_RESPONSE
+        );
     }
-
-
-
 }

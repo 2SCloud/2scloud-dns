@@ -1,8 +1,8 @@
-use std::path::Path;
 use crate::config::Config;
 use crate::dns::packet::DNSPacket;
 use crate::dns::packet::question::QuestionSection;
 use crate::exceptions::SCloudException;
+use std::path::Path;
 
 #[derive(Debug, PartialEq)]
 pub struct StubResolver {

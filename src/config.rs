@@ -4,11 +4,11 @@
 //! JSON configuration you provided. It includes helpers to load the config
 //! from a file and a light `validate()` method placeholder you can extend.
 
+use crate::exceptions::SCloudException;
 use anyhow::{Context, Result};
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::Path;
-use crate::exceptions::SCloudException;
 
 /// Top-level configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -87,8 +87,11 @@ impl Config {
     /// Load config from a JSON file path
     pub fn from_file(path: &Path) -> Result<Self, SCloudException> {
         let s = fs::read_to_string(path)
-            .with_context(|| format!("reading config file {}", path.display())).map_err(|_| SCloudException::SCLOUD_CONFIG_FILE_NOT_FOUND);
-        let cfg: Config = serde_json::from_str(&s.unwrap()).context("parsing JSON config").map_err(|_| SCloudException::SCLOUD_CONFIG_IMPOSSIBLE_TO_PARSE_JSON)?;
+            .with_context(|| format!("reading config file {}", path.display()))
+            .map_err(|_| SCloudException::SCLOUD_CONFIG_FILE_NOT_FOUND);
+        let cfg: Config = serde_json::from_str(&s.unwrap())
+            .context("parsing JSON config")
+            .map_err(|_| SCloudException::SCLOUD_CONFIG_IMPOSSIBLE_TO_PARSE_JSON)?;
         // cfg.validate()?;
         Ok(cfg)
     }
@@ -135,8 +138,8 @@ impl Default for Config {
 }
 
 /* ---------------------------
-   Server / runtime settings
-   --------------------------- */
+Server / runtime settings
+--------------------------- */
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ServerConfig {
@@ -174,8 +177,8 @@ impl Default for ServerConfig {
 }
 
 /* ---------------------------
-   Logging / metrics / admin
-   --------------------------- */
+Logging / metrics / admin
+--------------------------- */
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct LoggingConfig {
@@ -237,8 +240,8 @@ impl Default for AdminConfig {
 }
 
 /* ---------------------------
-   ACLs
-   --------------------------- */
+ACLs
+--------------------------- */
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AclEntry {
@@ -247,8 +250,8 @@ pub struct AclEntry {
 }
 
 /* ---------------------------
-   Listeners (UDP/TCP/DoT)
-   --------------------------- */
+Listeners (UDP/TCP/DoT)
+--------------------------- */
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ListenerConfig {
@@ -293,12 +296,12 @@ impl Default for ListenerConfig {
 #[serde(rename_all = "lowercase")]
 pub enum Protocol {
     UDP,
-    TCP
+    TCP,
 }
 
 /* ---------------------------
-   DoH
-   --------------------------- */
+DoH
+--------------------------- */
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DohConfig {
@@ -328,8 +331,8 @@ impl Default for DohConfig {
 }
 
 /* ---------------------------
-   Forwarders / root hints
-   --------------------------- */
+Forwarders / root hints
+--------------------------- */
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ForwarderConfig {
@@ -364,8 +367,8 @@ pub enum ForwardPolicy {
 }
 
 /* ---------------------------
-   Root hints
-   --------------------------- */
+Root hints
+--------------------------- */
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RootHintsConfig {
@@ -381,8 +384,8 @@ impl Default for RootHintsConfig {
 }
 
 /* ---------------------------
-   Cache & recursion
-   --------------------------- */
+Cache & recursion
+--------------------------- */
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CacheConfig {
@@ -427,8 +430,8 @@ impl Default for RecursionConfig {
 }
 
 /* ---------------------------
-   Rate limiting / RRL
-   --------------------------- */
+Rate limiting / RRL
+--------------------------- */
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RateLimitConfig {
@@ -471,8 +474,8 @@ impl Default for RrlConfig {
 }
 
 /* ---------------------------
-   Zones & Records
-   --------------------------- */
+Zones & Records
+--------------------------- */
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ZoneConfig {
@@ -552,8 +555,8 @@ pub struct ZoneRecord {
 }
 
 /* ---------------------------
-   TSIG / AXFR / DNSSEC
-   --------------------------- */
+TSIG / AXFR / DNSSEC
+--------------------------- */
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TsigKey {
@@ -599,8 +602,8 @@ impl Default for DnssecConfig {
 }
 
 /* ---------------------------
-   Policy / mitigation / tuning
-   --------------------------- */
+Policy / mitigation / tuning
+--------------------------- */
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PolicyConfig {
@@ -651,8 +654,8 @@ impl Default for TuningConfig {
 }
 
 /* ---------------------------
-   Views (split-horizon)
-   --------------------------- */
+Views (split-horizon)
+--------------------------- */
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ViewConfig {
@@ -669,8 +672,8 @@ pub struct ViewZone {
 }
 
 /* ---------------------------
-   Monitoring / dynamic updates / limits
-   --------------------------- */
+Monitoring / dynamic updates / limits
+--------------------------- */
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MonitoringConfig {
