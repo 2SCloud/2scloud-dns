@@ -105,6 +105,25 @@ impl Config {
         // For now, just return Ok.
         Ok(())
     }
+
+    /// Get the address of a specific forwarder
+    pub(crate) fn try_get_forwarder_addr(
+        &self,
+        forwarder_index: usize,
+        address_index: usize,
+    ) -> Result<std::net::SocketAddr, SCloudException> {
+        let addr = self
+            .forwarder
+            .get(forwarder_index)
+            .ok_or(SCloudException::SCLOUD_CONFIG_MISSING_FORWARDER)?
+            .addresses
+            .get(address_index)
+            .ok_or(SCloudException::SCLOUD_CONFIG_MISSING_ADDRESS)?
+            .parse()
+            .map_err(|_| SCloudException::SCLOUD_CONFIG_IMPOSSIBLE_TO_PARSE_ADDR)?;
+
+        Ok(addr)
+    }
 }
 
 impl Default for Config {
@@ -337,7 +356,7 @@ Forwarders / root hints
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ForwarderConfig {
     pub name: String,
-    pub addresses: Vec<String>, // host:port
+    pub addresses: Vec<String>,
     pub policy: ForwardPolicy,
     pub timeout_ms: u64,
     pub edns: bool,

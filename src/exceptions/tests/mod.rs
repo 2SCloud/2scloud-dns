@@ -5,7 +5,7 @@ mod tests {
 
     #[test]
     fn test_exceptions_to_str() {
-        let ex_msg_array: [&'static str; 33] = [
+        let ex_msg_array: [&'static str; 36] = [
             // HEADER SECTION
             "Buffer length is less than header length.",
             "The header is empty.",
@@ -50,6 +50,9 @@ mod tests {
             // CONFIG
             "[SCLOUD_CONFIG] Configuration file not found.",
             "[SCLOUD_CONFIG] Error while parsing the JSON file.",
+            "[SCLOUD_CONFIG] Missing forwarder.",
+            "[SCLOUD_CONFIG] Missing address.",
+            "[SCLOUD_CONFIG] Error while parsing the IP address.",
         ];
 
         let mut i = 0;
@@ -81,7 +84,7 @@ mod tests {
     #[test]
     fn test_exceptions_iter_count() {
         let count = SCloudException::iter().count();
-        let expected_count = 33;
+        let expected_count = 36;
         assert_eq!(count, expected_count);
     }
 
