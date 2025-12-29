@@ -49,16 +49,9 @@ mod tests {
         let config = Config::from_file(Path::new("./config/config.json")).unwrap();
         let result = StubResolver::new(
             config
-                .forwarder
-                .get(1)
-                .unwrap()
-                .addresses
-                .get(0)
-                .unwrap()
-                .parse()
+                .try_get_forwarder_addr_by_name("cloudflare")
                 .unwrap(),
-        )
-        .resolve(vec![QuestionSection {
+        ).resolve(vec![QuestionSection {
             q_name: "github.com".to_string(),
             q_type: DNSRecordType::CNAME,
             q_class: DNSClass::IN,
