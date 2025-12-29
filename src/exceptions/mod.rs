@@ -59,6 +59,9 @@ pub enum SCloudException {
     // CONFIG
     SCLOUD_CONFIG_FILE_NOT_FOUND,
     SCLOUD_CONFIG_IMPOSSIBLE_TO_PARSE_JSON,
+    SCLOUD_CONFIG_MISSING_FORWARDER,
+    SCLOUD_CONFIG_MISSING_ADDRESS,
+    SCLOUD_CONFIG_IMPOSSIBLE_TO_PARSE_ADDR,
 }
 
 impl SCloudException {
@@ -174,6 +177,13 @@ impl SCloudException {
             }
             SCloudException::SCLOUD_CONFIG_IMPOSSIBLE_TO_PARSE_JSON => {
                 "[SCLOUD_CONFIG] Error while parsing the JSON file."
+            }
+            SCloudException::SCLOUD_CONFIG_MISSING_FORWARDER => {
+                "[SCLOUD_CONFIG] Missing forwarder."
+            }
+            SCloudException::SCLOUD_CONFIG_MISSING_ADDRESS => "[SCLOUD_CONFIG] Missing address.",
+            SCloudException::SCLOUD_CONFIG_IMPOSSIBLE_TO_PARSE_ADDR => {
+                "[SCLOUD_CONFIG] Error while parsing the IP address."
             }
         }
     }

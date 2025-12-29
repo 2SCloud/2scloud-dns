@@ -3,8 +3,11 @@ use crate::config::{
     LimitsConfig, ListenerConfig, Protocol, RateLimitConfig, RecursionConfig, ServerConfig,
     ZoneConfig, ZoneType,
 };
+use crate::dns::resolver::stub::StubResolver;
 use serde_json;
 use std::io::Write;
+use std::net::SocketAddr;
+use std::path::Path;
 use tempfile::NamedTempFile;
 
 #[test]
@@ -122,4 +125,32 @@ fn test_limits_defaults() {
 fn test_validate_stub() {
     let cfg = Config::default();
     assert!(cfg.validate().is_ok());
+}
+
+#[test]
+fn test_get_forwarder_addr_by_index() {
+    let cfg = Config::from_file(Path::new("./config/config.json")).unwrap();
+
+    assert_ne!(
+        cfg.try_get_forwarder_addr_by_index(2, 0).unwrap(),
+        SocketAddr::new("1.1.1.1".parse().unwrap(), 53)
+    );
+    assert_eq!(
+        cfg.try_get_forwarder_addr_by_index(2, 0).unwrap(),
+        SocketAddr::new("192.0.0.245".parse().unwrap(), 53)
+    );
+}
+
+#[test]
+fn test_get_forwarder_addr_by_name() {
+    let cfg = Config::from_file(Path::new("./config/config.json")).unwrap();
+
+    assert_ne!(
+        cfg.try_get_forwarder_addr_by_name("sta-internal").unwrap(),
+        SocketAddr::new("1.1.1.1".parse().unwrap(), 53)
+    );
+    assert_eq!(
+        cfg.try_get_forwarder_addr_by_name("sta-internal").unwrap(),
+        SocketAddr::new("192.0.0.245".parse().unwrap(), 53)
+    );
 }

@@ -12,15 +12,10 @@ mod utils;
 
 fn main() {
     let config = Config::from_file(Path::new("./config/config.json")).unwrap();
+    // let resolver = StubResolver::new(config.try_get_forwarder_addr_by_index(2, 0).unwrap());
     let resolver = StubResolver::new(
         config
-            .forwarder
-            .get(2)
-            .unwrap()
-            .addresses
-            .get(0)
-            .unwrap()
-            .parse()
+            .try_get_forwarder_addr_by_name("sta-internal")
             .unwrap(),
     );
     println!(
