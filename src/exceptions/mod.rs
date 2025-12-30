@@ -49,7 +49,10 @@ pub enum SCloudException {
     SCLOUD_STUB_RESOLVER_FAILED_TO_READ_SOCKET_TIMEOUT,
     SCLOUD_STUB_RESOLVER_FAILED_TO_SEND_TO_SOCKET,
     SCLOUD_STUB_RESOLVER_FAILED_TO_RECV_FROM_SOCKET,
-    SCLOUD_STUB_RESOLVER_ANSWER_MISMATCH,
+
+    // RESOLVER
+    SCLOUD_RESOLVER_ANSWER_MISMATCH,
+    SCLOUD_RESOLVER_RECORD_OUT_OF_ZONE,
 
     // ZONES
     SCLOUD_ZONE_PARSER_FILE_NOT_FOUND,
@@ -159,8 +162,13 @@ impl SCloudException {
             SCloudException::SCLOUD_STUB_RESOLVER_FAILED_TO_RECV_FROM_SOCKET => {
                 "[STUB_RESOLVER] Failed to receive from socket."
             }
-            SCloudException::SCLOUD_STUB_RESOLVER_ANSWER_MISMATCH => {
-                "[STUB_RESOLVER] DNS response failed validation against the original query."
+            
+            // RESOLVER
+            SCloudException::SCLOUD_RESOLVER_ANSWER_MISMATCH => {
+                "[RESOLVER] DNS response failed validation against the original query."
+            }
+            SCloudException::SCLOUD_RESOLVER_RECORD_OUT_OF_ZONE => {
+                "[RESOLVER] Record out of zone."
             }
 
             // ZONES
