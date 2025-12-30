@@ -2,7 +2,7 @@ use crate::config::Config;
 use crate::dns::packet::DNSPacket;
 use crate::dns::packet::answer::AnswerSection;
 use crate::dns::packet::question::QuestionSection;
-use crate::dns::resolver::check_answer_diff;
+use crate::dns::resolver::{check_additional_diff, check_answer_diff, check_authority_diff};
 use crate::exceptions::SCloudException;
 use std::path::Path;
 
@@ -55,9 +55,11 @@ impl StubResolver {
                         return Err(SCloudException::SCLOUD_STUB_RESOLVER_INVALID_DNS_RESPONSE)?;
                     }
 
-                    let res = check_answer_diff(&questions, &*response.answers);
+                    let res_an = check_answer_diff(&questions, &*response.answers);
+                    let res_auth = check_authority_diff(&questions, &*response.authorities);
+                    let res_add = check_additional_diff(&questions, &*response.additionals);
 
-                    if res.is_ok() {
+                    if res_an.is_ok() && res_auth.is_ok() && res_add.is_ok() {
                         return Ok(response);
                     } else {
                         continue;

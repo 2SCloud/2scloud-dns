@@ -5,7 +5,7 @@ mod tests {
 
     #[test]
     fn test_exceptions_to_str() {
-        let ex_msg_array: [&'static str; 37] = [
+        let ex_msg_array: [&'static str; 38] = [
             // HEADER SECTION
             "Buffer length is less than header length.",
             "The header is empty.",
@@ -42,7 +42,9 @@ mod tests {
             "[STUB_RESOLVER] Failed to read, socket timeout.",
             "[STUB_RESOLVER] Failed to send to socket.",
             "[STUB_RESOLVER] Failed to receive from socket.",
-            "[STUB_RESOLVER] DNS response failed validation against the original query.",
+            // RESOLVER
+            "[RESOLVER] DNS response failed validation against the original query.",
+            "[RESOLVER] Record out of zone.",
             // ZONES
             "[ZONE_PARSER] Zone file not found.",
             "[ZONE_PARSER] Zone file is empty.",
@@ -85,7 +87,7 @@ mod tests {
     #[test]
     fn test_exceptions_iter_count() {
         let count = SCloudException::iter().count();
-        let expected_count = 37;
+        let expected_count = 38;
         assert_eq!(count, expected_count);
     }
 

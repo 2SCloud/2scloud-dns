@@ -205,7 +205,7 @@ mod tests {
                 }
 
                 if !found {
-                    return Err(SCloudException::SCLOUD_STUB_RESOLVER_ANSWER_MISMATCH);
+                    return Err(SCloudException::SCLOUD_RESOLVER_ANSWER_MISMATCH);
                 }
             }
 
@@ -214,7 +214,7 @@ mod tests {
 
         assert!(matches!(
             result,
-            Err(SCloudException::SCLOUD_STUB_RESOLVER_ANSWER_MISMATCH)
+            Err(SCloudException::SCLOUD_RESOLVER_ANSWER_MISMATCH)
         ));
     }
 }

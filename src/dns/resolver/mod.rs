@@ -1,4 +1,6 @@
+use crate::dns::packet::additional::AdditionalSection;
 use crate::dns::packet::answer::AnswerSection;
+use crate::dns::packet::authority::AuthoritySection;
 use crate::dns::packet::question::QuestionSection;
 use crate::exceptions::SCloudException;
 
@@ -25,10 +27,34 @@ pub(crate) fn check_answer_diff(
             }
 
             if !matched {
-                return Err(SCloudException::SCLOUD_STUB_RESOLVER_ANSWER_MISMATCH);
+                return Err(SCloudException::SCLOUD_RESOLVER_ANSWER_MISMATCH);
             }
         }
     }
 
+    Ok(())
+}
+
+pub(crate) fn check_authority_diff(
+    zone: &str,
+    authorities: &[AuthoritySection]
+) -> Result<(), SCloudException> {
+    for record in authorities.iter() {
+        if !record.q_name.ends_with(zone) {
+            return Err(SCloudException::SCLOUD_RESOLVER_RECORD_OUT_OF_ZONE);
+        }
+    }
+    Ok(())
+}
+
+pub(crate) fn check_additional_diff(
+    zone: &str,
+    additionals: &[AdditionalSection]
+) -> Result<(), SCloudException> {
+    for record in additionals.iter() {
+        if !record.q_name.ends_with(zone) {
+            return Err(SCloudException::SCLOUD_RESOLVER_RECORD_OUT_OF_ZONE);
+        }
+    }
     Ok(())
 }
