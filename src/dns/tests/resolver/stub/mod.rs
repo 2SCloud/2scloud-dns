@@ -10,6 +10,7 @@ mod tests {
     use crate::exceptions::SCloudException;
     use std::net::SocketAddr;
     use std::path::Path;
+    use crate::dns::packet::answer::AnswerSection;
 
     pub fn resolve_with_fake(
         stub: StubResolver,
@@ -101,7 +102,7 @@ mod tests {
 
     #[test]
     fn test_force_invalid_id() {
-        let mut packet = DNSPacket::new_query(vec![]);
+        let mut packet = DNSPacket::new_query(&[]);
         let request_id = packet.header.id;
 
         let invalid_id_packet = DNSPacket {
@@ -131,7 +132,7 @@ mod tests {
 
     #[test]
     fn test_force_invalid_response() {
-        let mut packet = DNSPacket::new_query(vec![]);
+        let mut packet = DNSPacket::new_query(&[]);
         let request_id = 42;
 
         let invalid_qr_packet = DNSPacket {
@@ -160,5 +161,62 @@ mod tests {
             result,
             SCloudException::SCLOUD_STUB_RESOLVER_INVALID_DNS_RESPONSE
         );
+    }
+
+    #[test]
+    fn resolver_rejects_response_with_mismatching_answer() {
+        let question = QuestionSection {
+            q_name: "example.com".to_string(),
+            q_type: DNSRecordType::A,
+            q_class: DNSClass::IN,
+        };
+
+        let questions = vec![question.clone()];
+        
+        let mut response = DNSPacket {
+            header: Header {
+                id: 1234,
+                qr: true,
+                ..Default::default()
+            },
+            questions: vec![question],
+            answers: vec![AnswerSection {
+                q_name: "evil.com".to_string(),
+                r_type: DNSRecordType::A,
+                r_class: DNSClass::IN,
+                ttl: 300,
+                rdlength: 0,
+                rdata: vec![127, 0, 0, 1],
+            }],
+            authorities: vec![],
+            additionals: vec![],
+        };
+        
+        let result = (|| {
+            for question in &questions {
+                let mut found = false;
+
+                for answer in &response.answers {
+                    if answer.q_name == question.q_name
+                        && answer.r_type == question.q_type
+                        && answer.r_class == question.q_class
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+
+                if !found {
+                    return Err(SCloudException::SCLOUD_STUB_RESOLVER_ANSWER_MISMATCH);
+                }
+            }
+
+            Ok(response)
+        })();
+        
+        assert!(matches!(
+            result,
+            Err(SCloudException::SCLOUD_STUB_RESOLVER_ANSWER_MISMATCH)
+        ));
     }
 }

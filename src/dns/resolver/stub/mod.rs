@@ -3,6 +3,7 @@ use crate::dns::packet::DNSPacket;
 use crate::dns::packet::question::QuestionSection;
 use crate::exceptions::SCloudException;
 use std::path::Path;
+use crate::dns::packet::answer::AnswerSection;
 
 #[derive(Debug, PartialEq)]
 pub struct StubResolver {
@@ -22,7 +23,7 @@ impl StubResolver {
     }
 
     pub fn resolve(&self, questions: Vec<QuestionSection>) -> Result<DNSPacket, SCloudException> {
-        let packet = DNSPacket::new_query(questions);
+        let packet = DNSPacket::new_query(&questions);
         let request_id = packet.header.id;
 
         let socket = std::net::UdpSocket::bind("0.0.0.0:0")
@@ -53,7 +54,24 @@ impl StubResolver {
                         return Err(SCloudException::SCLOUD_STUB_RESOLVER_INVALID_DNS_RESPONSE)?;
                     }
 
-                    return Ok(response);
+                    for question in &questions {
+                        let mut found = false;
+
+                        for answer in &response.answers {
+                            if answer.q_name == question.q_name
+                                && answer.r_type == question.q_type
+                                && answer.r_class == question.q_class
+                            {
+                                found = true;
+                                break;
+                            }
+                        }
+
+                        if !found {
+                            return Err(SCloudException::SCLOUD_STUB_RESOLVER_ANSWER_MISMATCH);
+                        }
+                    }
+
                 }
                 Err(e) => {
                     println!("[STUB_RESOLVER] recv_from error: {:?}", e);

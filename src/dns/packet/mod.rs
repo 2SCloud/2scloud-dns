@@ -97,7 +97,7 @@ impl DNSPacket {
     }
 
     /// Receive a QuestionSection, and return an AnswerSection
-    pub fn new_query(question_section: Vec<QuestionSection>) -> DNSPacket {
+    pub fn new_query(question_section: &[QuestionSection]) -> DNSPacket {
         DNSPacket {
             header: Header {
                 id: random::<u16>(),
@@ -114,7 +114,7 @@ impl DNSPacket {
                 nscount: 0,
                 arcount: 0,
             },
-            questions: question_section,
+            questions: question_section.to_vec(),
             answers: vec![],
             authorities: vec![],
             additionals: vec![],

@@ -210,7 +210,7 @@ mod tests {
 
     #[test]
     fn test_new_query() {
-        let result = DNSPacket::new_query(vec![QuestionSection {
+        let result = DNSPacket::new_query(&[QuestionSection {
             q_name: "github.com".to_string(),
             q_type: DNSRecordType::A,
             q_class: DNSClass::IN,
@@ -245,7 +245,7 @@ mod tests {
         println!(
             "expected: {:?}\ngot: {:?}",
             expected_packet,
-            DNSPacket::new_query(vec![QuestionSection {
+            DNSPacket::new_query(&[QuestionSection {
                 q_name: "github.com".to_string(),
                 q_type: DNSRecordType::A,
                 q_class: DNSClass::IN,
