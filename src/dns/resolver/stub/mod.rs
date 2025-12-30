@@ -22,6 +22,27 @@ impl StubResolver {
         }
     }
 
+    fn check_answer_diff(questions: &[QuestionSection], answers: &[AnswerSection]) -> Result<bool, SCloudException> {
+        let mut found = false;
+        for question in questions {
+
+            for answer in answers {
+                if answer.q_name == question.q_name
+                    && answer.r_type == question.q_type
+                    && answer.r_class == question.q_class
+                {
+                    found = true;
+                    break;
+                }
+            }
+
+            if !found {
+                return Err(SCloudException::SCLOUD_STUB_RESOLVER_ANSWER_MISMATCH);
+            }
+        }
+        Ok(found)
+    }
+
     pub fn resolve(&self, questions: Vec<QuestionSection>) -> Result<DNSPacket, SCloudException> {
         let packet = DNSPacket::new_query(&questions);
         let request_id = packet.header.id;
@@ -54,23 +75,7 @@ impl StubResolver {
                         return Err(SCloudException::SCLOUD_STUB_RESOLVER_INVALID_DNS_RESPONSE)?;
                     }
 
-                    for question in &questions {
-                        let mut found = false;
-
-                        for answer in &response.answers {
-                            if answer.q_name == question.q_name
-                                && answer.r_type == question.q_type
-                                && answer.r_class == question.q_class
-                            {
-                                found = true;
-                                break;
-                            }
-                        }
-
-                        if !found {
-                            return Err(SCloudException::SCLOUD_STUB_RESOLVER_ANSWER_MISMATCH);
-                        }
-                    }
+                    Self::check_answer_diff(&questions, &*response.answers);
 
                 }
                 Err(e) => {
