@@ -139,6 +139,18 @@ fn test_get_forwarder_addr_by_index() {
         cfg.try_get_forwarder_addr_by_index(2, 0).unwrap(),
         SocketAddr::new("192.0.0.245".parse().unwrap(), 53)
     );
+    assert_ne!(
+        cfg.try_get_forwarder_addr_by_index(1, 0).unwrap(),
+        SocketAddr::new("1.0.0.1".parse().unwrap(), 53)
+    );
+    assert_eq!(
+        cfg.try_get_forwarder_addr_by_index(1, 0).unwrap(),
+        SocketAddr::new("1.1.1.1".parse().unwrap(), 53)
+    );
+    assert_eq!(
+        cfg.try_get_forwarder_addr_by_index(1, 1).unwrap(),
+        SocketAddr::new("1.0.0.1".parse().unwrap(), 53)
+    );
 }
 
 #[test]
@@ -151,6 +163,14 @@ fn test_get_forwarder_addr_by_name() {
     );
     assert_eq!(
         cfg.try_get_forwarder_addr_by_name("sta-internal").unwrap(),
+        SocketAddr::new("192.0.0.245".parse().unwrap(), 53)
+    );
+    assert_eq!(
+        cfg.try_get_forwarder_addr_by_name("cloudflare").unwrap(),
+        SocketAddr::new("1.1.1.1".parse().unwrap(), 53)
+    );
+    assert_ne!(
+        cfg.try_get_forwarder_addr_by_name("cloudflare").unwrap(),
         SocketAddr::new("192.0.0.245".parse().unwrap(), 53)
     );
 }
