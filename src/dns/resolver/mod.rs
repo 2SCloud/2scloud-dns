@@ -36,24 +36,28 @@ pub(crate) fn check_answer_diff(
 }
 
 pub(crate) fn check_authority_diff(
-    zone: &str,
+    questions: &[QuestionSection],
     authorities: &[AuthoritySection]
 ) -> Result<(), SCloudException> {
     for record in authorities.iter() {
-        if !record.q_name.ends_with(zone) {
-            return Err(SCloudException::SCLOUD_RESOLVER_RECORD_OUT_OF_ZONE);
+        for question in questions {
+            if !record.q_name.ends_with(question.q_name.as_str()) {
+                return Err(SCloudException::SCLOUD_RESOLVER_RECORD_OUT_OF_ZONE);
+            }
         }
     }
     Ok(())
 }
 
 pub(crate) fn check_additional_diff(
-    zone: &str,
+    questions: &[QuestionSection],
     additionals: &[AdditionalSection]
 ) -> Result<(), SCloudException> {
     for record in additionals.iter() {
-        if !record.q_name.ends_with(zone) {
-            return Err(SCloudException::SCLOUD_RESOLVER_RECORD_OUT_OF_ZONE);
+        for question in questions {
+            if !record.q_name.ends_with(question.q_name.as_str()) {
+                return Err(SCloudException::SCLOUD_RESOLVER_RECORD_OUT_OF_ZONE);
+            }
         }
     }
     Ok(())
