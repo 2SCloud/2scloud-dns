@@ -66,7 +66,7 @@ impl StubResolver {
                         return Err(e);
                     }
 
-                    Ok::<DNSPacket, SCloudException>(response);
+                    Ok(response);
                 }
                 Err(e) => {
                     println!("[STUB_RESOLVER] recv_from error: {:?}", e);
