@@ -54,15 +54,7 @@ impl StubResolver {
                         return Err(SCloudException::SCLOUD_STUB_RESOLVER_INVALID_DNS_RESPONSE)?;
                     }
 
-                    if let Err(e) = check_answer_diff(&questions, &*response.answers) {
-                        return Err(e);
-                    }
-
-                    if let Err(e) = check_authority_diff(&questions, &*response.authorities) {
-                        return Err(e);
-                    }
-
-                    if let Err(e) = check_additional_diff(&questions, &*response.additionals) {
+                    if let Err(e) = check_answer_diff(&questions, &*response.answers, &*response.authorities, &*response.additionals) {
                         return Err(e);
                     }
 

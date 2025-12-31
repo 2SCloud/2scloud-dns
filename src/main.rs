@@ -2,8 +2,8 @@ use crate::config::Config;
 use crate::dns::packet::question::QuestionSection;
 use crate::dns::q_class::DNSClass;
 use crate::dns::q_type::DNSRecordType;
-use crate::dns::resolver::stub::StubResolver;
 use std::path::Path;
+use crate::dns::resolver::stub::StubResolver;
 
 mod config;
 mod dns;
@@ -25,7 +25,7 @@ fn main() {
 
     let q = vec![QuestionSection {
         q_name: "github.com".to_string(),
-        q_type: DNSRecordType::A,
+        q_type: DNSRecordType::CNAME,
         q_class: DNSClass::IN,
     }];
 
