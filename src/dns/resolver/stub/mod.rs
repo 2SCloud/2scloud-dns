@@ -23,7 +23,7 @@ impl StubResolver {
     }
 
     pub fn resolve(&self, questions: Vec<QuestionSection>) -> Result<DNSPacket, SCloudException> {
-        let packet = DNSPacket::new_query(&questions);
+        let packet = DNSPacket::new_query(&questions.as_slice());
         let request_id = packet.header.id;
 
         let socket = std::net::UdpSocket::bind("0.0.0.0:0")
@@ -54,15 +54,19 @@ impl StubResolver {
                         return Err(SCloudException::SCLOUD_STUB_RESOLVER_INVALID_DNS_RESPONSE)?;
                     }
 
-                    let res_an = check_answer_diff(&questions, &*response.answers);
-                    let res_auth = check_authority_diff(&questions, &*response.authorities);
-                    let res_add = check_additional_diff(&questions, &*response.additionals);
-
-                    if res_an.is_ok() && res_auth.is_ok() && res_add.is_ok() {
-                        return Ok(response);
-                    } else {
-                        continue;
+                    if let Err(e) = check_answer_diff(&questions, &*response.answers) {
+                        return Err(e);
                     }
+
+                    if let Err(e) = check_authority_diff(&questions, &*response.authorities) {
+                        return Err(e);
+                    }
+
+                    if let Err(e) = check_additional_diff(&questions, &*response.additionals) {
+                        return Err(e);
+                    }
+
+                    Ok::<DNSPacket, SCloudException>(response);
                 }
                 Err(e) => {
                     println!("[STUB_RESOLVER] recv_from error: {:?}", e);

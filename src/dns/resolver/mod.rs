@@ -11,11 +11,9 @@ pub(crate) fn check_answer_diff(
     answers: &[AnswerSection],
 ) -> Result<(), SCloudException> {
     for q in questions {
-        let found = answers.iter().any(|a| {
-            a.q_name == q.q_name &&
-                a.r_type == q.q_type &&
-                a.r_class == q.q_class
-        });
+        let found = answers
+            .iter()
+            .any(|a| a.q_name == q.q_name && a.r_type == q.q_type && a.r_class == q.q_class);
 
         if !found {
             return Err(SCloudException::SCLOUD_RESOLVER_ANSWER_MISMATCH);
