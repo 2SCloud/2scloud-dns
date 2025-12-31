@@ -15,7 +15,7 @@ fn main() {
     // let resolver = StubResolver::new(config.try_get_forwarder_addr_by_index(2, 0).unwrap());
     let resolver = StubResolver::new(
         config
-            .try_get_forwarder_addr_by_name("sta-internal")
+            .try_get_forwarder_addr_by_name("cloudflare")
             .unwrap(),
     );
     println!(

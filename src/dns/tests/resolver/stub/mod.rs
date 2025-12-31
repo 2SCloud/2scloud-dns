@@ -49,7 +49,7 @@ mod tests {
     fn test_stub_resolve() {
         let config = Config::from_file(Path::new("./config/config.json")).unwrap();
         let result =
-            StubResolver::new(config.try_get_forwarder_addr_by_name("sta-internal").unwrap())
+            StubResolver::new(config.try_get_forwarder_addr_by_name("cloudflare").unwrap())
                 .resolve(vec![QuestionSection {
                     q_name: "github.com".to_string(),
                     q_type: DNSRecordType::CNAME,
