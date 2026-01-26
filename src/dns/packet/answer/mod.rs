@@ -15,6 +15,28 @@ pub struct AnswerSection {
 
 impl AnswerSection {
     /// Serialize AnswerSection into bytes (simple form, no compression)
+    ///
+    /// # Exemple :
+    /// ```
+    /// use crate::dns::answer::AnswerSection;
+    /// use crate::dns::q_type::DNSRecordType;
+    /// use crate::dns::q_class::DNSClass;
+    ///
+    /// // A Answer for example.com → 93.184.216.34
+    /// let answer = AnswerSection {
+    ///     q_name: "example.com".to_string(),
+    ///     r_type: DNSRecordType::A,
+    ///     r_class: DNSClass::IN,
+    ///     ttl: 300,
+    ///     rdlength: 4,
+    ///     rdata: vec![93, 184, 216, 34],
+    /// };
+    ///
+    /// let bytes = answer.to_bytes().unwrap();
+    ///
+    /// // NAME + TYPE + CLASS + TTL + RDLENGTH + RDATA
+    /// assert!(bytes.len() > 12);
+    /// ```
     pub fn to_bytes(&self) -> Result<Vec<u8>, SCloudException> {
         let mut buf = Vec::new();
 
@@ -44,6 +66,34 @@ impl AnswerSection {
     }
 
     /// Deserialize one AnswerSection and return (section, consumed_bytes)
+    ///
+    /// # Exemple :
+    /// ```
+    /// use crate::dns::answer::AnswerSection;
+    /// use crate::dns::q_type::DNSRecordType;
+    /// use crate::dns::q_class::DNSClass;
+    ///
+    /// // example.com A 93.184.216.34
+    /// let raw_answer: Vec<u8> = vec![
+    ///     0x07, b'e', b'x', b'a', b'm', b'p', b'l', b'e',
+    ///     0x03, b'c', b'o', b'm',
+    ///     0x00,             // End of NAME
+    ///     0x00, 0x01,       // TYPE = A
+    ///     0x00, 0x01,       // CLASS = IN
+    ///     0x00, 0x00, 0x01, 0x2c, // TTL = 300
+    ///     0x00, 0x04,       // RDLENGTH = 4
+    ///     93, 184, 216, 34, // RDATA
+    /// ];
+    ///
+    /// let (answer, consumed) = AnswerSection::from_bytes(&raw_answer, 0).unwrap();
+    ///
+    /// assert_eq!(answer.q_name, "example.com");
+    /// assert_eq!(answer.r_type, DNSRecordType::A);
+    /// assert_eq!(answer.r_class, DNSClass::IN);
+    /// assert_eq!(answer.ttl, 300);
+    /// assert_eq!(answer.rdata, vec![93, 184, 216, 34]);
+    /// assert_eq!(consumed, raw_answer.len());
+    /// ```
     pub(crate) fn from_bytes(
         buf: &[u8],
         offset: usize,

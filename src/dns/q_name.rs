@@ -1,7 +1,31 @@
 use crate::exceptions::SCloudException;
 
-// TODO: check this function because QNAME start at byte 12, and he seems to not take that in count.
-/// Proper DNS QNAME parsing (length-label encoded + compression support)
+/// Parse a DNS QNAME from a DNS message buffer.
+///
+/// This function supports:
+/// - Standard DNS label encoding
+/// - Name compression using pointers (RFC 1035, section 4.1.4)
+///
+/// # Arguments
+/// * `buf` - Full DNS message buffer
+/// * `pos` - Offset in the buffer where the QNAME starts
+///
+/// # Returns
+/// * `(String, usize)`
+///   - Parsed domain name (e.g. "www.example.com")
+///   - Number of bytes consumed at the original position
+///
+/// # Errors
+/// Returns an error if:
+/// - The buffer is too short
+/// - A label length is invalid
+/// - Compression pointers are malformed
+///
+/// # Notes
+/// - When compression is used, the returned `usize` corresponds
+///   to the position right after the pointer (not the expanded name).
+/// - The caller is responsible for passing the correct initial offset
+///   (e.g. 12 for the first QNAME in a DNS packet).
 pub(crate) fn parse_qname(buf: &[u8], mut pos: usize) -> Result<(String, usize), SCloudException> {
     let mut labels = Vec::new();
     let mut jumped = false;
@@ -59,7 +83,9 @@ pub(crate) fn parse_qname(buf: &[u8], mut pos: usize) -> Result<(String, usize),
     Ok((labels.join("."), end_pos))
 }
 
-/// Helper: parse a qname at an offset (used for compression)
+/// Parse a DNS QNAME at a specific offset and return only the name.
+///
+/// This is mainly used internally when resolving compression pointers.
 pub(crate) fn parse_qname_at(buf: &[u8], offset: usize) -> Result<String, SCloudException> {
     let (name, _consumed) = parse_qname(&buf, offset)?;
     Ok(name)

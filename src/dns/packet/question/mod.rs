@@ -13,6 +13,24 @@ pub struct QuestionSection {
 
 impl QuestionSection {
     /// Serialize the DNS question section into a byte array
+    ///
+    /// # Exemple :
+    /// ```
+    /// use crate::dns::packet::question::QuestionSection;
+    /// use crate::dns::q_type::DNSRecordType;
+    /// use crate::dns::q_class::DNSClass;
+    ///
+    /// let question = QuestionSection {
+    ///     q_name: "example.com".to_string(),
+    ///     q_type: DNSRecordType::A,
+    ///     q_class: DNSClass::IN,
+    /// };
+    ///
+    /// let bytes = question.to_bytes().unwrap();
+    ///
+    /// // QNAME + QTYPE + QCLASS
+    /// assert!(bytes.len() > 6);
+    /// ```
     pub fn to_bytes(&self) -> Result<Vec<u8>, SCloudException> {
         let mut buf = Vec::with_capacity(self.q_name.len() + 5);
 
@@ -38,6 +56,29 @@ impl QuestionSection {
     }
 
     /// Deserialize the DNS question section from a byte array
+    ///
+    /// # Exemple :
+    /// ```
+    /// use crate::dns::packet::question::QuestionSection;
+    /// use crate::dns::q_type::DNSRecordType;
+    /// use crate::dns::q_class::DNSClass;
+    ///
+    /// // example.com A IN
+    /// let raw_question: Vec<u8> = vec![
+    ///     0x07, b'e', b'x', b'a', b'm', b'p', b'l', b'e',
+    ///     0x03, b'c', b'o', b'm',
+    ///     0x00,       // End of QNAME
+    ///     0x00, 0x01, // QTYPE = A
+    ///     0x00, 0x01, // QCLASS = IN
+    /// ];
+    ///
+    /// let (question, consumed) = QuestionSection::from_bytes(&raw_question, 0).unwrap();
+    ///
+    /// assert_eq!(question.q_name, "example.com");
+    /// assert_eq!(question.q_type, DNSRecordType::A);
+    /// assert_eq!(question.q_class, DNSClass::IN);
+    /// assert_eq!(consumed, raw_question.len());
+    /// ```
     pub fn from_bytes(
         buf: &[u8],
         offset: usize,

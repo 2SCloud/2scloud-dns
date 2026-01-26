@@ -7,6 +7,38 @@ use std::collections::HashMap;
 use std::fs::File;
 use std::io::{self, BufRead};
 
+/// Parse a DNS zone file and build an in-memory `Zone` structure.
+///
+/// The zone file must be located in the `zones/` directory and named
+/// `<qname>.zone`.
+///
+/// This parser supports:
+/// - `$TTL` directive (default TTL)
+/// - `$ORIGIN` directive
+/// - SOA record (unique per zone)
+/// - Common DNS record types: A, AAAA, NS, MX, TXT, SOA, CNAME, PTR, SRV, CAA, NAPTR
+///
+/// Records are stored by owner name in a `HashMap<String, Vec<DNSRecord>>`.
+/// The SOA record is stored separately in `zone.soa`.
+///
+/// # Arguments
+/// * `qname` - The zone name (used to locate the zone file)
+///
+/// # Errors
+/// Returns `SCloudException` if:
+/// - the zone file cannot be found
+/// - the file is empty or unreadable
+/// - TTL parsing fails
+///
+/// # Example
+/// ```
+/// use crate::dns::zones::zone_parser;
+///
+/// let zone = zone_parser("example.com").expect("Failed to parse zone");
+///
+/// assert!(zone.soa.is_some());
+/// assert!(!zone.records.is_empty());
+/// ```
 pub fn zone_parser(qname: &str) -> Result<Zone, SCloudException> {
     let filename = format!("zones/{}.zone", qname);
     let file =

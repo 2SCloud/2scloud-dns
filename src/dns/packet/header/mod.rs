@@ -21,6 +21,33 @@ impl Header {
     pub(crate) const DNS_HEADER_LEN: usize = 12;
 
     /// Serialize the DNS header into a byte array
+    ///
+    /// # Exemple :
+    /// ```
+    /// use crate::dns::packet::header::Header;
+    ///
+    /// let header = Header {
+    ///     id: 0x1234,
+    ///     qr: false,
+    ///     opcode: 0,
+    ///     aa: false,
+    ///     tc: false,
+    ///     rd: true,
+    ///     ra: false,
+    ///     z: 0,
+    ///     rcode: 0,
+    ///     qdcount: 1,
+    ///     ancount: 0,
+    ///     nscount: 0,
+    ///     arcount: 0,
+    /// };
+    ///
+    /// let bytes = header.to_bytes().unwrap();
+    ///
+    /// assert_eq!(bytes.len(), Header::DNS_HEADER_LEN);
+    /// assert_eq!(bytes[0], 0x12);
+    /// assert_eq!(bytes[1], 0x34);
+    /// ```
     pub fn to_bytes(&self) -> Result<[u8; Self::DNS_HEADER_LEN], SCloudException> {
         let mut bytes = [0u8; Self::DNS_HEADER_LEN];
 
@@ -62,6 +89,27 @@ impl Header {
     }
 
     /// Deserialize the DNS header from a byte array
+    ///
+    /// # Exemple :
+    /// ```
+    /// use crate::dns::packet::header::Header;
+    ///
+    /// let raw_header: [u8; 12] = [
+    ///     0x12, 0x34, // ID
+    ///     0x01, 0x00, // Flags (standard query, RD = 1)
+    ///     0x00, 0x01, // QDCOUNT = 1
+    ///     0x00, 0x00, // ANCOUNT = 0
+    ///     0x00, 0x00, // NSCOUNT = 0
+    ///     0x00, 0x00, // ARCOUNT = 0
+    /// ];
+    ///
+    /// let header = Header::from_bytes(&raw_header).unwrap();
+    ///
+    /// assert_eq!(header.id, 0x1234);
+    /// assert_eq!(header.qr, false);
+    /// assert_eq!(header.rd, true);
+    /// assert_eq!(header.qdcount, 1);
+    /// ```
     pub fn from_bytes(buf: &[u8]) -> Result<Header, SCloudException> {
         if buf.len() == 0 {
             return Err(SCloudException::SCLOUD_HEADER_BYTES_EMPTY);

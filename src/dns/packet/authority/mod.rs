@@ -13,6 +13,39 @@ pub(crate) struct AuthoritySection {
 }
 
 impl AuthoritySection {
+    /// Deserialize one AuthoritySection (NS record) and return (section, consumed_bytes)
+    ///
+    /// # Exemple :
+    /// ```
+    /// use crate::dns::packet::authority::AuthoritySection;
+    /// use crate::dns::q_type::DNSRecordType;
+    /// use crate::dns::q_class::DNSClass;
+    ///
+    /// // example.com NS ns1.example.com
+    /// let raw_authority: Vec<u8> = vec![
+    ///     0x07, b'e', b'x', b'a', b'm', b'p', b'l', b'e',
+    ///     0x03, b'c', b'o', b'm',
+    ///     0x00,             // End of QNAME
+    ///     0x00, 0x02,       // TYPE = NS
+    ///     0x00, 0x01,       // CLASS = IN
+    ///     0x00, 0x00, 0x0e, 0x10, // TTL = 3600
+    ///     0x00, 0x11,       // RDLENGTH = 17
+    ///     0x03, b'n', b's', b'1',
+    ///     0x07, b'e', b'x', b'a', b'm', b'p', b'l', b'e',
+    ///     0x03, b'c', b'o', b'm',
+    ///     0x00,             // End of NSNAME
+    /// ];
+    ///
+    /// let (authority, consumed) =
+    ///     AuthoritySection::from_bytes(&raw_authority, 0).unwrap();
+    ///
+    /// assert_eq!(authority.q_name, "example.com");
+    /// assert_eq!(authority.q_type, DNSRecordType::NS);
+    /// assert_eq!(authority.q_class, DNSClass::IN);
+    /// assert_eq!(authority.ttl, 3600);
+    /// assert_eq!(authority.ns_name, "ns1.example.com");
+    /// assert_eq!(consumed, raw_authority.len());
+    /// ```
     pub(crate) fn from_bytes(
         buf: &[u8],
         offset: usize,
@@ -57,6 +90,27 @@ impl AuthoritySection {
         ))
     }
 
+    /// Serialize the AuthoritySection (NS record) into bytes
+    ///
+    /// # Exemple :
+    /// ```
+    /// use crate::dns::packet::authority::AuthoritySection;
+    /// use crate::dns::q_type::DNSRecordType;
+    /// use crate::dns::q_class::DNSClass;
+    ///
+    /// let authority = AuthoritySection {
+    ///     q_name: "example.com".to_string(),
+    ///     q_type: DNSRecordType::NS,
+    ///     q_class: DNSClass::IN,
+    ///     ttl: 3600,
+    ///     ns_name: "ns1.example.com".to_string(),
+    /// };
+    ///
+    /// let bytes = authority.to_bytes().unwrap();
+    ///
+    /// // NAME + TYPE + CLASS + TTL + RDLENGTH + RDATA
+    /// assert!(bytes.len() > 20);
+    /// ```
     pub(crate) fn to_bytes(&self) -> Result<Vec<u8>, SCloudException> {
         let mut buf = Vec::new();
 

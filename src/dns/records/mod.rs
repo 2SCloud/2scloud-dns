@@ -1,6 +1,22 @@
 use crate::dns::q_class::DNSClass;
 use crate::dns::q_type::DNSRecordType;
 
+/// A generic DNS resource record representation.
+///
+/// `DNSRecord` is a high-level abstraction used to represent DNS records
+/// independently of their wire format. It is typically produced after
+/// parsing DNS packets and can be used by resolvers, caches, or
+/// application-level logic.
+///
+/// Supported record types include:
+/// - A / AAAA
+/// - NS
+/// - MX
+/// - SRV
+/// - CAA
+/// - NAPTR
+///
+/// Optional fields are populated depending on the record type.
 #[derive(Debug, Clone, PartialEq)]
 pub(crate) struct DNSRecord {
     pub name: String,

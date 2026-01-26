@@ -14,6 +14,37 @@ pub(crate) struct AdditionalSection {
 }
 
 impl AdditionalSection {
+    /// Deserialize one AdditionalSection and return (section, consumed_bytes)
+    ///
+    /// # Exemple :
+    /// ```
+    /// use crate::dns::packet::additional::AdditionalSection;
+    /// use crate::dns::q_type::DNSRecordType;
+    /// use crate::dns::q_class::DNSClass;
+    ///
+    /// // Record A in additional section (ns1.example.com → 192.0.2.1)
+    /// let raw_additional: Vec<u8> = vec![
+    ///     0x03, b'n', b's', b'1',
+    ///     0x07, b'e', b'x', b'a', b'm', b'p', b'l', b'e',
+    ///     0x03, b'c', b'o', b'm',
+    ///     0x00,             // End of QNAME
+    ///     0x00, 0x01,       // TYPE = A
+    ///     0x00, 0x01,       // CLASS = IN
+    ///     0x00, 0x00, 0x01, 0x2c, // TTL = 300
+    ///     0x00, 0x04,       // RDLENGTH = 4
+    ///     192, 0, 2, 1,     // RDATA
+    /// ];
+    ///
+    /// let (additional, consumed) =
+    ///     AdditionalSection::from_bytes(&raw_additional, 0).unwrap();
+    ///
+    /// assert_eq!(additional.q_name, "ns1.example.com");
+    /// assert_eq!(additional.q_type, DNSRecordType::A);
+    /// assert_eq!(additional.q_class, DNSClass::IN);
+    /// assert_eq!(additional.ttl, 300);
+    /// assert_eq!(additional.rdata, vec![192, 0, 2, 1]);
+    /// assert_eq!(consumed, raw_additional.len());
+    /// ```
     pub(crate) fn from_bytes(
         buf: &[u8],
         offset: usize,
@@ -59,6 +90,28 @@ impl AdditionalSection {
         ))
     }
 
+    /// Serialize the AdditionalSection into bytes
+    ///
+    /// # Exemple :
+    /// ```
+    /// use crate::dns::packet::additional::AdditionalSection;
+    /// use crate::dns::q_type::DNSRecordType;
+    /// use crate::dns::q_class::DNSClass;
+    ///
+    /// let additional = AdditionalSection {
+    ///     q_name: "ns1.example.com".to_string(),
+    ///     q_type: DNSRecordType::A,
+    ///     q_class: DNSClass::IN,
+    ///     ttl: 300,
+    ///     rdlength: 4,
+    ///     rdata: vec![192, 0, 2, 1],
+    /// };
+    ///
+    /// let bytes = additional.to_bytes().unwrap();
+    ///
+    /// // NAME + TYPE + CLASS + TTL + RDLENGTH + RDATA
+    /// assert!(bytes.len() > 20);
+    /// ```
     pub(crate) fn to_bytes(&self) -> Result<Vec<u8>, SCloudException> {
         let mut buf: Vec<u8> = Vec::new();
 

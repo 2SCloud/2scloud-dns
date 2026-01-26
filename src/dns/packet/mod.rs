@@ -23,6 +23,29 @@ pub struct DNSPacket {
 
 impl DNSPacket {
     /// Deserialize the DNS packet from a byte array
+    /// # Exemple :
+    /// ```
+    /// // Raw DNS query for `github.com` with type A
+    /// let raw_packet: Vec<u8> = vec![
+    ///     0x12, 0x34, // ID
+    ///     0x01, 0x00, // Flags (standard query, RD = 1)
+    ///     0x00, 0x01, // QDCOUNT
+    ///     0x00, 0x00, // ANCOUNT
+    ///     0x00, 0x00, // NSCOUNT
+    ///     0x00, 0x00, // ARCOUNT
+    ///     0x06, b'g', b'i', b't', b'h', b'u', b'b',
+    ///     0x03, b'c', b'o', b'm',
+    ///     0x00,       // End of QNAME
+    ///     0x00, 0x01, // QTYPE = A
+    ///     0x00, 0x01, // QCLASS = IN
+    /// ];
+    ///
+    /// let packet = DNSPacket::from_bytes(&raw_packet).unwrap();
+    ///
+    /// assert_eq!(packet.header.qdcount, 1);
+    /// assert_eq!(packet.questions[0].q_name, "github.com");
+    /// assert!(packet.answers.is_empty());
+    /// ```
     pub fn from_bytes(buf: &[u8]) -> Result<DNSPacket, SCloudException> {
         let mut pos = 0;
 
@@ -66,8 +89,20 @@ impl DNSPacket {
         })
     }
 
-    // TODO: make the others parts of the DNSPacket
     /// Serialize the DNS packet into a byte array
+    /// # Exemple :
+    /// ```
+    /// let packet = DNSPacket::new_query(&[QuestionSection {
+    ///     q_name: "github.com".to_string(),
+    ///     q_type: DNSRecordType::A,
+    ///     q_class: DNSClass::IN,
+    /// }]);
+    ///
+    /// let bytes = packet.to_bytes().unwrap();
+    ///
+    /// // A valid DNS packet is at least 12 bytes (header)
+    /// assert!(bytes.len() >= 12);
+    /// ```
     pub fn to_bytes(&self) -> Result<Vec<u8>, SCloudException> {
         let mut bytes = Vec::new();
 
@@ -95,7 +130,44 @@ impl DNSPacket {
         Ok(bytes)
     }
 
-    /// Receive a QuestionSection, and return an AnswerSection
+    /// Receive one or more `QuestionSection`, and return a new DNSPacket
+    /// # Exemple :
+    /// ```
+    /// let query = DNSPacket::new_query(&[QuestionSection {
+    ///                 q_name: "github.com".to_string(),
+    ///                 q_type: DNSRecordType::A,
+    ///                 q_class: DNSClass::IN,
+    ///             }])
+    /// ```
+    ///
+    /// # Return :
+    /// ```
+    /// DNSPacket {
+    ///             header: Header {
+    ///                 id: {random_generated_id},
+    ///                 qr: false,
+    ///                 opcode: 0,
+    ///                 aa: false,
+    ///                 tc: false,
+    ///                 rd: true,
+    ///                 ra: false,
+    ///                 z: 0,
+    ///                 rcode: 0,
+    ///                 qdcount: 1,
+    ///                 ancount: 0,
+    ///                 nscount: 0,
+    ///                 arcount: 0,
+    ///             },
+    ///             questions: vec![QuestionSection {
+    ///                 q_name: "github.com".to_string(),
+    ///                 q_type: DNSRecordType::A,
+    ///                 q_class: DNSClass::IN,
+    ///             }],
+    ///             answers: vec![],
+    ///             authorities: vec![],
+    ///             additionals: vec![],
+    ///         };
+    /// ```
     pub fn new_query(question_section: &[QuestionSection]) -> DNSPacket {
         DNSPacket {
             header: Header {
