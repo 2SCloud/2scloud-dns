@@ -1,14 +1,14 @@
 #[allow(unused_imports)]
 mod tests {
-    use std::net::SocketAddr;
+    use crate::Config;
     use crate::Path;
     use crate::config::{
-        LimitsConfig, DnssecConfig, AxfrConfig, RateLimitConfig, RecursionConfig,
-        CacheConfig, DohConfig, ForwardPolicy, ForwarderConfig, ZoneType, ZoneConfig,
-        Protocol, ListenerConfig, ServerConfig,
+        AxfrConfig, CacheConfig, DnssecConfig, DohConfig, ForwardPolicy, ForwarderConfig,
+        LimitsConfig, ListenerConfig, Protocol, RateLimitConfig, RecursionConfig, ServerConfig,
+        ZoneConfig, ZoneType,
     };
+    use std::net::SocketAddr;
     use tempfile::NamedTempFile;
-    use crate::Config;
 
     #[test]
     fn test_default_config() {
@@ -41,7 +41,8 @@ mod tests {
         let json = serde_json::to_string(&cfg).expect("Failed to serialize config");
         write!(temp_file, "{}", json).expect("Failed to write to temp file");
 
-        let loaded_cfg = Config::from_file(temp_file.path()).expect("Failed to load config from file");
+        let loaded_cfg =
+            Config::from_file(temp_file.path()).expect("Failed to load config from file");
         assert_eq!(loaded_cfg.server.name, cfg.server.name);
         assert_eq!(loaded_cfg.logging.level, cfg.logging.level);
     }

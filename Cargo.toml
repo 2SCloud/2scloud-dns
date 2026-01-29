@@ -13,8 +13,9 @@ serde_json = "1.0.145"
 tempfile = "3.23.0"
 
 # Linux / Unix
-nix = { version = "0.31.1", features = ["resource", "process"] }
+nix = { version = "0.31.1", features = ["process", "user"] }
 libc = "0.2.180"
+winapi = "0.3.9"
 
 # Windows (uniquement compilé sur Windows)
 [target.'cfg(windows)'.dependencies]
