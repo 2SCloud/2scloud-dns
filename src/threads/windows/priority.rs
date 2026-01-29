@@ -32,7 +32,7 @@ pub(crate) mod imp {
             ThreadPriority::REALTIME => THREAD_PRIORITY_TIME_CRITICAL,
         };
 
-        let ok = unsafe { SetThreadPriority(GetCurrentThread(), prio) };
+        let ok = unsafe { SetThreadPriority(GetCurrentThread(), prio.try_into().unwrap()) };
 
         if ok == FALSE {
             Err(io::Error::last_os_error())
