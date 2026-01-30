@@ -13,7 +13,7 @@
     "bind_port": 53
   },
   "logging": {
-    "level": "info",
+    "level": "warn",
     "format": "json",
     "file": "/var/log/scloud-dns/scloud-dns.log",
     "rotate": true,
@@ -137,11 +137,16 @@
     "file": "/etc/scloud/root.hints"
   },
   "cache": {
+    "_comments": {
+      "enabled": "Enable/Disable the cache system",
+      "max_entries": "Max limit of records in the cache HashMap",
+      "eviction_policy": "light-lru/lru"
+    },
     "enabled": true,
-    "max_entries": 200000,
+    "max_entries": 150000,
     "max_ttl_seconds": 86400,
     "negative_ttl_seconds": 300,
-    "eviction_policy": "lru"
+    "eviction_policy": "light-lru"
   },
   "recursion": {
     "enabled": true,
