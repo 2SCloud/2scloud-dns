@@ -1,3 +1,5 @@
+use std::sync::atomic::{AtomicU64, Ordering};
+
 #[cfg(windows)]
 mod windows;
 #[cfg(target_os = "linux")]
@@ -33,7 +35,64 @@ mod thread {
 
 #[allow(unused)]
 #[allow(non_camel_case_types)]
-#[derive(Debug, Copy, Clone)]
+pub(crate) struct ScloudWorker {
+    pub(crate) worker_type: WorkerType,
+    pub(crate) os_thread_id: AtomicU64,
+    pub(crate) priority: ThreadPriority,
+    pub(crate) priority_scope: PriorityScope,
+    pub(crate) stack_size_bytes: usize,
+    pub(crate) buffer_budget_bytes: usize,
+    pub(crate) max_stack_size_bytes: usize,
+    pub(crate) max_buffer_budget_bytes: usize,
+}
+
+#[allow(unused)]
+impl ScloudWorker {
+    pub(crate) fn new(worker_type: WorkerType) -> Self {
+        Self {
+            worker_type,
+            os_thread_id: AtomicU64::new(0),
+            priority: ThreadPriority::NORMAL,
+            priority_scope: PriorityScope::THREAD,
+            stack_size_bytes: 2 * 1024 * 1024,
+            buffer_budget_bytes: 4 * 1024 * 1024,
+            max_stack_size_bytes: 32 * 1024 * 1024,
+            max_buffer_budget_bytes: 256 * 1024 * 1024,
+        }
+    }
+
+    pub(crate) fn set_os_thread_id(&self, tid: u64) {
+        self.os_thread_id.store(tid, Ordering::Relaxed);
+    }
+
+    pub(crate) fn os_thread_id(&self) -> u64 {
+        self.os_thread_id.load(Ordering::Relaxed)
+    }
+}
+
+#[allow(unused)]
+#[allow(non_camel_case_types)]
+#[derive(Debug, Copy, Clone, PartialEq)]
+pub enum WorkerType {
+    Listener,
+    Decoder,
+    QueryDispatcher,
+    CacheLookup,
+    ZoneManager,
+    Resolver,
+    CacheWriter,
+    Encoder,
+    Sender,
+
+    CacheJanitor,
+
+    Metrics,
+    TcpAcceptor
+}
+
+#[allow(unused)]
+#[allow(non_camel_case_types)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub enum ThreadPriority {
     IDLE,
     LOW,
@@ -46,7 +105,7 @@ pub enum ThreadPriority {
 
 #[allow(unused)]
 #[allow(non_camel_case_types)]
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub enum PriorityScope {
     THREAD,
     PROCESS,
