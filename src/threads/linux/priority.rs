@@ -1,4 +1,3 @@
-#[cfg(target_os = "linux")]
 pub(crate) mod imp {
     use nix::unistd::{getpgid, getpid, gettid, getuid};
     use std::io;

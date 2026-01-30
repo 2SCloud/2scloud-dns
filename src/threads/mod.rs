@@ -2,6 +2,31 @@
 mod windows;
 #[cfg(target_os = "linux")]
 mod linux;
+#[cfg(target_os = "macos")]
+mod macos;
+#[cfg(not(any(windows, target_os = "linux")))]
+mod others;
+
+#[cfg(windows)]
+mod thread {
+    pub(crate) use crate::threads::windows::priority::imp;
+}
+
+#[cfg(target_os = "linux")]
+mod thread {
+    pub(crate) use crate::threads::linux::priority;
+    pub(crate) use crate::threads::linux::imp;
+}
+
+#[cfg(target_os = "macos")]
+mod thread {
+    pub(crate) use crate::threads::macos::priority;
+}
+
+#[cfg(not(any(windows, target_os = "linux", target_os= "macos")))]
+mod thread {
+    pub(crate) use crate::threads::others::priority;
+}
 
 #[allow(unused)]
 #[allow(non_camel_case_types)]
@@ -26,26 +51,27 @@ pub enum PriorityScope {
     PROCESS_GROUP,
 }
 
-#[allow(unused)]
-pub fn set_priority(scope: PriorityScope, p: ThreadPriority) -> std::io::Result<()> {
-    imp::set_priority(scope, p)
+pub struct SpawnConfig<'a> {
+    pub name: Option<&'a str>,
+    pub stack_size: Option<usize>,
 }
 
-#[cfg(windows)]
-use crate::threads::windows::priority::imp;
-
-#[cfg(target_os = "linux")]
-use crate::threads::linux::priority::imp;
-
-#[cfg(not(any(windows, target_os = "linux")))]
-mod imp {
-    use super::{PriorityScope, ThreadPriority};
-    use std::io;
-
-    pub(crate) fn set_priority(_: PriorityScope, _: ThreadPriority) -> io::Result<()> {
-        Err(io::Error::new(
-            io::ErrorKind::Unsupported,
-            "Priority control not supported on this OS",
-        ))
+impl<'a> Default for SpawnConfig<'a> {
+    fn default() -> Self {
+        Self { name: None, stack_size: None }
     }
+}
+
+#[allow(unused)]
+pub fn new<F, T>(cfg: SpawnConfig<'_>, f: F) -> std::thread::JoinHandle<T>
+where
+    F: FnOnce() -> T + Send + 'static,
+    T: Send + 'static,
+{
+    thread::imp::new(cfg, f)
+}
+
+#[allow(unused)]
+pub fn set_priority(scope: PriorityScope, p: ThreadPriority) -> std::io::Result<()> {
+    thread::priority::imp::set_priority(scope, p)
 }

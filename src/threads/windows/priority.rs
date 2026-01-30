@@ -1,4 +1,3 @@
-#[cfg(windows)]
 pub(crate) mod imp {
     use crate::threads::{PriorityScope, ThreadPriority};
     use std::io;

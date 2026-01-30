@@ -1,4 +1,4 @@
-pub(crate) mod priority;
+mod priority;
 
 pub(crate) mod imp {
     use super::super::SpawnConfig;
