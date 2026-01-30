@@ -1,7 +1,6 @@
 pub(crate) mod imp {
     use crate::threads::{PriorityScope, ThreadPriority};
     use std::io;
-
     use winapi::shared::minwindef::FALSE;
     use winapi::um::processthreadsapi::{
         GetCurrentProcess, GetCurrentThread, SetPriorityClass, SetThreadPriority,

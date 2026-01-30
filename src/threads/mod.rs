@@ -9,23 +9,26 @@ mod others;
 
 #[cfg(windows)]
 mod thread {
-    pub(crate) use crate::threads::windows::priority::imp;
+    pub(crate) use crate::threads::windows::priority::imp as priority;
+    pub(crate) use crate::threads::windows::imp as thread_base;
 }
 
 #[cfg(target_os = "linux")]
 mod thread {
-    pub(crate) use crate::threads::linux::priority;
-    pub(crate) use crate::threads::linux::imp;
+    pub(crate) use crate::threads::linux::priority::imp as priority;
+    pub(crate) use crate::threads::linux::imp as thread_base;
 }
 
 #[cfg(target_os = "macos")]
 mod thread {
-    pub(crate) use crate::threads::macos::priority;
+    pub(crate) use crate::threads::macos::priority::imp as priority;
+    pub(crate) use crate::threads::macos::imp as thread_base;
 }
 
 #[cfg(not(any(windows, target_os = "linux", target_os= "macos")))]
 mod thread {
-    pub(crate) use crate::threads::others::priority;
+    pub(crate) use crate::threads::others::priority::imp as priority;
+    pub(crate) use crate::threads::others::imp as thread_base;
 }
 
 #[allow(unused)]
@@ -68,10 +71,10 @@ where
     F: FnOnce() -> T + Send + 'static,
     T: Send + 'static,
 {
-    thread::imp::new(cfg, f)
+    thread::thread_base::new(cfg, f)
 }
 
 #[allow(unused)]
 pub fn set_priority(scope: PriorityScope, p: ThreadPriority) -> std::io::Result<()> {
-    thread::priority::imp::set_priority(scope, p)
+    thread::priority::set_priority(scope, p)
 }

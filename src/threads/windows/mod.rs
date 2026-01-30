@@ -3,7 +3,7 @@ pub(crate) mod priority;
 pub(crate) mod imp {
     use super::super::SpawnConfig;
 
-    pub fn new<F, T>(cfg: SpawnConfig<'_>, f: F) -> std::thread::JoinHandle<T>
+    pub(crate) fn new<F, T>(cfg: SpawnConfig<'_>, f: F) -> std::thread::JoinHandle<T>
     where
         F: FnOnce() -> T + Send + 'static,
         T: Send + 'static,
