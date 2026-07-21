@@ -1,12 +1,13 @@
 mod types;
 
 #[cfg(test)]
+#[allow(clippy::module_inception)]
 mod tests {
     use crate::workers::manager::StartGate;
     use crate::workers::task::InFlightTask;
     use crate::{exceptions, workers};
     use std::any::type_name_of_val;
-    use std::fmt::Debug;
+
     use std::sync::Arc;
     use std::sync::atomic::Ordering;
     use tokio::sync::mpsc;
@@ -45,7 +46,7 @@ mod tests {
             worker.state.load(Ordering::Relaxed),
             workers::WorkerState::INIT as u8
         );
-        assert_eq!(worker.shutdown_requested.load(Ordering::Relaxed), false);
+        assert!(!worker.shutdown_requested.load(Ordering::Relaxed));
         assert_eq!(
             worker.shutdown_mode.load(Ordering::Relaxed),
             workers::ShutdownMode::GRACEFUL as u8
@@ -72,7 +73,7 @@ mod tests {
             exceptions::SCloudException::SCLOUD_WORKER_LISTENER_NO_SOCKET
         ));
     }
-    
+
     #[tokio::test]
     async fn test_run_listener_fails_if_tx_not_set() {
         let w = Arc::new(workers::SCloudWorker::new(workers::WorkerType::LISTENER).unwrap());
@@ -345,7 +346,7 @@ mod tests {
         w.dns_rx.lock().await.push(rx0);
         w.dns_tx.lock().await.push(tx0);
 
-        let (rx, tx) = w.get_dns_rx_tx().await.expect("should return rx+tx");
+        let (_rx, _tx) = w.get_dns_rx_tx().await.expect("should return rx+tx");
 
         assert!(w.dns_rx.lock().await.is_empty());
         assert!(w.dns_tx.lock().await.is_empty());
@@ -358,7 +359,7 @@ mod tests {
         let (_, rx0) = mpsc::channel::<InFlightTask>(8);
         w.dns_rx.lock().await.push(rx0);
 
-        let rx = w.get_dns_rx().await.expect("should return rx");
+        let _rx = w.get_dns_rx().await.expect("should return rx");
 
         assert!(w.dns_rx.lock().await.is_empty());
     }
@@ -370,7 +371,7 @@ mod tests {
         let (tx0, _) = mpsc::channel::<InFlightTask>(8);
         w.dns_tx.lock().await.push(tx0);
 
-        let tx = w.get_dns_tx().await.expect("should return tx");
+        let _tx = w.get_dns_tx().await.expect("should return tx");
 
         assert!(w.dns_tx.lock().await.is_empty());
     }
@@ -408,7 +409,7 @@ mod tests {
     #[test]
     pub fn test_get_shutdown_requested() {
         let w = Arc::new(workers::SCloudWorker::new(workers::WorkerType::TCP_ACCEPTOR).unwrap());
-        assert_eq!(w.get_shutdown_requested(), false)
+        assert!(!w.get_shutdown_requested())
     }
 
     #[test]
@@ -610,7 +611,7 @@ mod tests {
     pub fn test_set_shutdown_requested() {
         let w = Arc::new(workers::SCloudWorker::new(workers::WorkerType::TCP_ACCEPTOR).unwrap());
         w.set_shutdown_requested(true);
-        assert_eq!(w.get_shutdown_requested(), true);
+        assert!(w.get_shutdown_requested());
     }
 
     #[test]

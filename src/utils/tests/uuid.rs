@@ -1,3 +1,4 @@
+#[cfg(test)]
 use crate::utils;
 
 #[cfg(test)]

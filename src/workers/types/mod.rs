@@ -2,6 +2,7 @@ pub(crate) mod cache_janitor;
 pub(crate) mod cache_lookup;
 pub(crate) mod cache_writer;
 pub(crate) mod decoder;
+pub(crate) mod doh_acceptor;
 pub(crate) mod encoder;
 pub(crate) mod listener;
 pub(crate) mod metrics;

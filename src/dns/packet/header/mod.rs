@@ -111,7 +111,7 @@ impl Header {
     /// assert_eq!(header.qdcount, 1);
     /// ```
     pub fn from_bytes(buf: &[u8]) -> Result<Header, SCloudException> {
-        if buf.len() == 0 {
+        if buf.is_empty() {
             return Err(SCloudException::SCLOUD_HEADER_BYTES_EMPTY);
         }
 

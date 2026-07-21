@@ -102,12 +102,11 @@ pub fn log(level: LogLevel, target: &str, msg: &str) {
 
     if g.cfg.rotate {
         let max_bytes = g.cfg.max_size_mb.saturating_mul(1024 * 1024);
-        if max_bytes > 0 {
-            if let Ok(meta) = g.file.metadata() {
-                if meta.len() >= max_bytes {
-                    let _ = rotate_file(&mut *g);
-                }
-            }
+        if max_bytes > 0
+            && let Ok(meta) = g.file.metadata()
+            && meta.len() >= max_bytes
+        {
+            let _ = rotate_file(&mut g);
         }
     }
 

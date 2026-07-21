@@ -13,11 +13,7 @@ mod tests {
             .unwrap()
             .as_millis();
 
-        let diff = if sys_ms >= ms {
-            sys_ms - ms
-        } else {
-            ms - sys_ms
-        };
+        let diff = sys_ms.abs_diff(ms);
         assert!(diff <= 2_000);
     }
 

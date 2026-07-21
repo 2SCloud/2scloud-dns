@@ -32,6 +32,7 @@ mod tests {
             let cfg = LoggingConfig {
                 file: log_path.to_string_lossy().to_string(),
                 level: LogLevel::TRACE,
+                dyn_ui: false,
                 live_print: false,
                 rotate: false,
                 max_size_mb: 1,
@@ -81,7 +82,7 @@ mod tests {
         logging::log(LogLevel::ERROR, "tests/logging.rs", "boom");
         let after_lines = read_lines(&path).len();
 
-        assert!(after_lines >= before_lines + 1);
+        assert!(after_lines > before_lines);
     }
 
     #[test]

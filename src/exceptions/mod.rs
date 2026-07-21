@@ -1,4 +1,3 @@
-use crate::dns::q_class::DNSClass;
 use strum_macros::EnumIter;
 
 mod tests;
@@ -121,7 +120,6 @@ pub enum SCloudException {
     // LISTENER
     SCLOUD_WORKER_LISTENER_RECV_FAILED = 76,
     SCLOUD_WORKER_LISTENER_NO_SOCKET = 82,
-
     // DECODER
 }
 
@@ -354,9 +352,7 @@ impl SCloudException {
             SCloudException::SCLOUD_WORKER_TCPA_SOCKET_CREATION_FAILED => {
                 "Impossible to create a TCP_ACCEPTOR worker, socket creation failed."
             }
-            SCloudException::SCLOUD_WORKER_TCPA_RECV_FAILED => {
-                "TCP_ACCEPTOR recv() failed."
-            }
+            SCloudException::SCLOUD_WORKER_TCPA_RECV_FAILED => "TCP_ACCEPTOR recv() failed.",
             SCloudException::SCLOUD_WORKER_TCPA_SOCKET_BIND_FAILED => {
                 "Impossible to bind TCP_ACCEPTOR socket, most probable cause: another worker is already using this port."
             }

@@ -94,8 +94,9 @@ mod tests {
     #[test]
     fn test_doh_config_defaults() {
         let doh = DohConfig::default();
-        assert_eq!(doh.enabled, false);
-        assert_eq!(doh.bind, "0.0.0.0:443");
+        assert!(!doh.enabled);
+        assert_eq!(doh.bind, "0.0.0.0:8053");
+        assert!(!doh.terminate_tls);
         assert_eq!(doh.paths, vec!["/dns-query"]);
     }
 
@@ -139,7 +140,7 @@ mod tests {
 
     #[test]
     fn test_get_forwarder_addr_by_index() {
-        let cfg = Config::from_file(Path::new("./config/config.json").into()).unwrap();
+        let cfg = Config::from_file(Path::new("./config/config.json")).unwrap();
 
         assert_ne!(
             cfg.try_get_forwarder_addr_by_index(2, 0).unwrap(),

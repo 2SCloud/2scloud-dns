@@ -35,8 +35,8 @@ mod tests {
             authorities: vec![],
             additionals: vec![],
         };
-        let result = dns::resolver::check_response_diff(response_packet, &[origin_q]).unwrap();
-        assert_eq!(result, ());
+        dns::resolver::check_response_diff(response_packet, &[origin_q]).unwrap();
+        assert_eq!((), ());
     }
 
     #[test]
@@ -86,8 +86,8 @@ mod tests {
             rdlength: 0,
             rdata: vec![],
         };
-        let result = dns::resolver::check_answer_diff(&[q], &[a]).unwrap();
-        assert_eq!(result, ());
+        dns::resolver::check_answer_diff(&[q], &[a]).unwrap();
+        assert_eq!((), ());
     }
 
     #[test]
@@ -126,8 +126,8 @@ mod tests {
             ttl: 0,
             ns_name: "".to_string(),
         };
-        let result = dns::resolver::check_authority_diff(&[q], &[a]).unwrap();
-        assert_eq!(result, ());
+        dns::resolver::check_authority_diff(&[q], &[a]).unwrap();
+        assert_eq!((), ());
     }
 
     #[test]
@@ -166,8 +166,8 @@ mod tests {
             rdlength: 0,
             rdata: vec![],
         };
-        let result = dns::resolver::check_additional_diff(&[q], &[a]).unwrap();
-        assert_eq!(result, ());
+        dns::resolver::check_additional_diff(&[q], &[a]).unwrap();
+        assert_eq!((), ());
     }
 
     #[test]

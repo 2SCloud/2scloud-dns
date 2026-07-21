@@ -1,7 +1,7 @@
 use crate::config::Config;
 use crate::dns::packet::DNSPacket;
 use crate::dns::packet::question::QuestionSection;
-use crate::dns::resolver::{check_answer_diff, check_response_diff};
+use crate::dns::resolver::check_response_diff;
 use crate::exceptions::SCloudException;
 use std::path::Path;
 
@@ -77,7 +77,7 @@ impl StubResolver {
     /// assert!(!response.answers.is_empty());
     /// ```
     pub fn resolve(&self, questions: Vec<QuestionSection>) -> Result<DNSPacket, SCloudException> {
-        let packet = DNSPacket::new_query(&questions.as_slice());
+        let packet = DNSPacket::new_query(questions.as_slice());
         let request_id = packet.header.id;
 
         let socket = std::net::UdpSocket::bind("0.0.0.0:0")
@@ -108,9 +108,7 @@ impl StubResolver {
                         return Err(SCloudException::SCLOUD_STUB_RESOLVER_INVALID_DNS_RESPONSE)?;
                     }
 
-                    if let Err(e) = check_response_diff(response.clone(), &questions) {
-                        return Err(e);
-                    }
+                    check_response_diff(response.clone(), &questions)?;
 
                     return Ok(response);
                 }

@@ -7,7 +7,7 @@ use std::sync::Arc;
 use tokio::sync::mpsc;
 
 pub async fn run_dns_decoder(
-    worker: Arc<SCloudWorker>,
+    _worker: Arc<SCloudWorker>,
     mut rx: Vec<mpsc::Receiver<InFlightTask>>,
     tx: Vec<mpsc::Sender<InFlightTask>>,
 ) -> Result<(), SCloudException> {
@@ -35,10 +35,10 @@ pub async fn run_dns_decoder(
                     }
                 }
 
-                if let Some(unsent) = current {
-                    if tx[0].send(unsent).await.is_err() {
-                        return Ok(());
-                    }
+                if let Some(unsent) = current
+                    && tx[0].send(unsent).await.is_err()
+                {
+                    return Ok(());
                 }
             }
         }

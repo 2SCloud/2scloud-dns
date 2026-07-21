@@ -12,7 +12,7 @@ use std::fs;
 use std::path::Path;
 
 /// Top-level configuration
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct Config {
     #[serde(default)]
     pub server: ServerConfig,
@@ -162,28 +162,30 @@ impl Config {
         }
 
         if self.doh.enabled {
-            if self
-                .doh
-                .tls_cert_path
-                .as_deref()
-                .unwrap_or("")
-                .trim()
-                .is_empty()
-            {
-                return Err(SCloudException::SCLOUD_CONFIG_TLS_MISSING_CERT);
-            }
-            if self
-                .doh
-                .tls_key_path
-                .as_deref()
-                .unwrap_or("")
-                .trim()
-                .is_empty()
-            {
-                return Err(SCloudException::SCLOUD_CONFIG_TLS_MISSING_KEY);
-            }
             if self.doh.paths.is_empty() {
                 return Err(SCloudException::SCLOUD_CONFIG_INVALID_DOH);
+            }
+            if self.doh.terminate_tls {
+                if self
+                    .doh
+                    .tls_cert_path
+                    .as_deref()
+                    .unwrap_or("")
+                    .trim()
+                    .is_empty()
+                {
+                    return Err(SCloudException::SCLOUD_CONFIG_TLS_MISSING_CERT);
+                }
+                if self
+                    .doh
+                    .tls_key_path
+                    .as_deref()
+                    .unwrap_or("")
+                    .trim()
+                    .is_empty()
+                {
+                    return Err(SCloudException::SCLOUD_CONFIG_TLS_MISSING_KEY);
+                }
             }
         }
 
@@ -243,21 +245,24 @@ impl Config {
                         }
                     }
 
-                    if let Some(acl) = z.notify_acl.as_deref() {
-                        if !acl.trim().is_empty() && !is_acl_ref_valid(acl) {
-                            return Err(SCloudException::SCLOUD_CONFIG_UNKNOWN_ACL_REFERENCE);
-                        }
+                    if let Some(acl) = z.notify_acl.as_deref()
+                        && !acl.trim().is_empty()
+                        && !is_acl_ref_valid(acl)
+                    {
+                        return Err(SCloudException::SCLOUD_CONFIG_UNKNOWN_ACL_REFERENCE);
                     }
-                    if let Some(acl) = z.allow_transfer_acl.as_deref() {
-                        if !acl.trim().is_empty() && !is_acl_ref_valid(acl) {
-                            return Err(SCloudException::SCLOUD_CONFIG_UNKNOWN_ACL_REFERENCE);
-                        }
+                    if let Some(acl) = z.allow_transfer_acl.as_deref()
+                        && !acl.trim().is_empty()
+                        && !is_acl_ref_valid(acl)
+                    {
+                        return Err(SCloudException::SCLOUD_CONFIG_UNKNOWN_ACL_REFERENCE);
                     }
 
-                    if let Some(k) = z.axfr_tsig_key.as_deref() {
-                        if !k.trim().is_empty() && !tsig_names.contains(k) {
-                            return Err(SCloudException::SCLOUD_CONFIG_UNKNOWN_TSIG_KEY);
-                        }
+                    if let Some(k) = z.axfr_tsig_key.as_deref()
+                        && !k.trim().is_empty()
+                        && !tsig_names.contains(k)
+                    {
+                        return Err(SCloudException::SCLOUD_CONFIG_UNKNOWN_TSIG_KEY);
                     }
                 }
                 ZoneType::Slave => {
@@ -324,10 +329,11 @@ impl Config {
             if d.acl.trim().is_empty() || !is_acl_ref_valid(&d.acl) {
                 return Err(SCloudException::SCLOUD_CONFIG_UNKNOWN_ACL_REFERENCE);
             }
-            if let Some(k) = d.tsig_key.as_deref() {
-                if !k.trim().is_empty() && !tsig_names.contains(k) {
-                    return Err(SCloudException::SCLOUD_CONFIG_UNKNOWN_TSIG_KEY);
-                }
+            if let Some(k) = d.tsig_key.as_deref()
+                && !k.trim().is_empty()
+                && !tsig_names.contains(k)
+            {
+                return Err(SCloudException::SCLOUD_CONFIG_UNKNOWN_TSIG_KEY);
             }
 
             if !zone_names.contains(d.zone.as_str()) {
@@ -379,37 +385,6 @@ impl Config {
     }
 }
 
-impl Default for Config {
-    fn default() -> Self {
-        Self {
-            server: ServerConfig::default(),
-            workers: WorkersConfig::default(),
-            logging: LoggingConfig::default(),
-            metrics: MetricsConfig::default(),
-            admin: AdminConfig::default(),
-            acl: Vec::new(),
-            listener: Vec::new(),
-            doh: DohConfig::default(),
-            forwarder: Vec::new(),
-            root_hints: RootHintsConfig::default(),
-            cache: CacheConfig::default(),
-            recursion: RecursionConfig::default(),
-            ratelimit: RateLimitConfig::default(),
-            zone: Vec::new(),
-            tsig_key: Vec::new(),
-            axfr: AxfrConfig::default(),
-            dnssec: DnssecConfig::default(),
-            policy: PolicyConfig::default(),
-            amplification_mitigation: AmplificationMitigationConfig::default(),
-            tuning: TuningConfig::default(),
-            view: Vec::new(),
-            monitoring: MonitoringConfig::default(),
-            dynupdate: Vec::new(),
-            limits: LimitsConfig::default(),
-        }
-    }
-}
-
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ServerConfig {
     pub name: String,
@@ -447,7 +422,13 @@ impl Default for ServerConfig {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct WorkersConfig {
+    /// Number of UDP listener workers. Each binds the same port with
+    /// SO_REUSEPORT so the kernel load-balances datagrams across them.
+    #[serde(default = "default_listener_workers")]
     pub listener: u16,
+    pub tcp_acceptor: u16,
+    #[serde(default)]
+    pub doh_acceptor: u16,
     pub decoder: u16,
     pub query_dispatcher: u16,
     pub cache_lookup: u16,
@@ -458,13 +439,18 @@ pub struct WorkersConfig {
     pub sender: u16,
     pub cache_janitor: u16,
     pub metrics: u16,
-    pub tcp_acceptor: u16,
+}
+
+fn default_listener_workers() -> u16 {
+    4
 }
 
 impl Default for WorkersConfig {
     fn default() -> Self {
         WorkersConfig {
-            listener: 5,
+            listener: 4,
+            tcp_acceptor: 1,
+            doh_acceptor: 1,
             decoder: 5,
             query_dispatcher: 3,
             cache_lookup: 3,
@@ -475,7 +461,6 @@ impl Default for WorkersConfig {
             sender: 5,
             cache_janitor: 1,
             metrics: 2,
-            tcp_acceptor: 1,
         }
     }
 }
@@ -485,6 +470,7 @@ pub struct LoggingConfig {
     pub level: LogLevel,
     pub format: LogFormat,
     pub file: String,
+    pub dyn_ui: bool,
     pub rotate: bool,
     pub live_print: bool,
     pub max_size_mb: u64,
@@ -496,6 +482,7 @@ impl Default for LoggingConfig {
             level: LogLevel::INFO,
             format: LogFormat::TEXT,
             file: "/var/log/scloud-dns/scloud-dns.log".to_string(),
+            dyn_ui: false,
             rotate: true,
             live_print: false,
             max_size_mb: 200,
@@ -652,6 +639,8 @@ pub struct DohConfig {
     pub enabled: bool,
     pub bind: String,
     #[serde(default)]
+    pub terminate_tls: bool,
+    #[serde(default)]
     pub tls_cert_path: Option<String>,
     #[serde(default)]
     pub tls_key_path: Option<String>,
@@ -665,7 +654,8 @@ impl Default for DohConfig {
     fn default() -> Self {
         DohConfig {
             enabled: false,
-            bind: "0.0.0.0:443".to_string(),
+            bind: "0.0.0.0:8053".to_string(),
+            terminate_tls: false,
             tls_cert_path: None,
             tls_key_path: None,
             paths: vec!["/dns-query".to_string()],
@@ -921,18 +911,10 @@ impl Default for DnssecConfig {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct PolicyConfig {
     #[serde(default)]
     pub deny_domains: Vec<String>,
-}
-
-impl Default for PolicyConfig {
-    fn default() -> Self {
-        PolicyConfig {
-            deny_domains: Vec::new(),
-        }
-    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

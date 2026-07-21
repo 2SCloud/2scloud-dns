@@ -17,6 +17,6 @@ COPY --from=builder /app/zones /app/zones
 
 USER nonroot:nonroot
 
-EXPOSE 53/udp 53/tcp
+EXPOSE 53/udp 53/tcp 8053/tcp
 
 ENTRYPOINT ["/app/scloud-dns"]

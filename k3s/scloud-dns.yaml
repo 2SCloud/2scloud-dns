@@ -20,7 +20,7 @@ spec:
           emptyDir: {}
       containers:
         - name: scloud-dns
-          image: ghcr.io/2scloud/scloud-dns:0.2.3-live-stdout
+          image: ghcr.io/2scloud/scloud-dns:0.3.0-doh-stdout
           imagePullPolicy: Always
           resources:
             requests:
@@ -35,6 +35,9 @@ spec:
               protocol: UDP
             - name: dns-tcp
               containerPort: 53
+              protocol: TCP
+            - name: dns-doh
+              containerPort: 8053
               protocol: TCP
           volumeMounts:
             - name: logs
@@ -71,5 +74,9 @@ spec:
     - name: dns-tcp
       port: 53
       targetPort: dns-tcp
+      protocol: TCP
+    - name: dns-doh
+      port: 8053
+      targetPort: dns-doh
       protocol: TCP
   type: ClusterIP

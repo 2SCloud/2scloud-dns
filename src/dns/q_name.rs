@@ -27,9 +27,7 @@ use crate::exceptions::SCloudException;
 /// - The caller is responsible for passing the correct initial offset
 ///   (e.g. 12 for the first QNAME in a DNS packet).
 pub(crate) fn parse_qname(buf: &[u8], mut pos: usize) -> Result<(String, usize), SCloudException> {
-    let mut labels = Vec::new();
-    let mut _jumped = false;
-    let mut end_pos = pos;
+    let mut name = String::new();
 
     loop {
         if pos >= buf.len() {
@@ -45,23 +43,18 @@ pub(crate) fn parse_qname(buf: &[u8], mut pos: usize) -> Result<(String, usize),
             }
 
             let offset = (((len as u16 & 0x3F) << 8) | buf[pos + 1] as u16) as usize;
-
-            if !_jumped {
-                end_pos = pos + 2;
+            let (suffix, _) = parse_qname(buf, offset)?;
+            for label in suffix.split('.') {
+                if !name.is_empty() {
+                    name.push('.');
+                }
+                name.push_str(label);
             }
-
-            _jumped = true;
-
-            let (name, _) = parse_qname(buf, offset)?;
-            labels.extend(name.split('.').map(|s| s.to_string()));
-            break;
+            return Ok((name, pos + 2));
         }
 
         if len == 0 {
-            if !_jumped {
-                end_pos = pos + 1;
-            }
-            break;
+            return Ok((name, pos + 1));
         }
 
         pos += 1;
@@ -72,15 +65,15 @@ pub(crate) fn parse_qname(buf: &[u8], mut pos: usize) -> Result<(String, usize),
             );
         }
 
-        let label = &buf[pos..pos + len as usize];
-        let s = String::from_utf8(label.to_vec())
+        let label = std::str::from_utf8(&buf[pos..pos + len as usize])
             .map_err(|_| SCloudException::SCLOUD_IMPOSSIBLE_PARSE_QNAME)?;
 
-        labels.push(s);
+        if !name.is_empty() {
+            name.push('.');
+        }
+        name.push_str(label);
         pos += len as usize;
     }
-
-    Ok((labels.join("."), end_pos))
 }
 
 /// Parse a DNS QNAME at a specific offset and return only the name.
@@ -88,6 +81,6 @@ pub(crate) fn parse_qname(buf: &[u8], mut pos: usize) -> Result<(String, usize),
 /// This is mainly used internally when resolving compression pointers.
 #[allow(unused)]
 pub(crate) fn parse_qname_at(buf: &[u8], offset: usize) -> Result<String, SCloudException> {
-    let (name, _consumed) = parse_qname(&buf, offset)?;
+    let (name, _consumed) = parse_qname(buf, offset)?;
     Ok(name)
 }

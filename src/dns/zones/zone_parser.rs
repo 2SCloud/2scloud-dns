@@ -137,16 +137,12 @@ pub fn zone_parser(qname: &str) -> Result<Zone, SCloudException> {
 
         let value_parts: Vec<&str> = parts.collect();
 
-        let value_str = if rtype == DNSRecordType::TXT {
-            value_parts.join(" ")
-        } else {
-            value_parts.join(" ")
-        };
+        let value_str = value_parts.join(" ");
 
         let mut record = DNSRecord {
             name: name.clone(),
-            rtype: rtype.clone(),
-            rclass: rclass.clone(),
+            rtype,
+            rclass,
             ttl,
             value: value_str,
             priority: None,
@@ -162,36 +158,30 @@ pub fn zone_parser(qname: &str) -> Result<Zone, SCloudException> {
 
         match rtype {
             DNSRecordType::MX => {
-                if value_parts.len() >= 2 {
-                    if let Ok(prio) = value_parts[0].parse::<u16>() {
-                        record.priority = Some(prio);
-                        record.value = value_parts[1..].join(" ");
-                    }
+                if value_parts.len() >= 2
+                    && let Ok(prio) = value_parts[0].parse::<u16>()
+                {
+                    record.priority = Some(prio);
+                    record.value = value_parts[1..].join(" ");
                 }
             }
-            DNSRecordType::SRV => {
-                if value_parts.len() >= 4 {
-                    record.priority = value_parts[0].parse().ok();
-                    record.weight = value_parts[1].parse().ok();
-                    record.port = value_parts[2].parse().ok();
-                    record.value = value_parts[3..].join(" ");
-                }
+            DNSRecordType::SRV if value_parts.len() >= 4 => {
+                record.priority = value_parts[0].parse().ok();
+                record.weight = value_parts[1].parse().ok();
+                record.port = value_parts[2].parse().ok();
+                record.value = value_parts[3..].join(" ");
             }
-            DNSRecordType::CAA => {
-                if value_parts.len() >= 3 {
-                    record.flags = value_parts[0].parse().ok();
-                    record.tag = Some(value_parts[1].to_string());
-                    record.value = value_parts[2..].join(" ");
-                }
+            DNSRecordType::CAA if value_parts.len() >= 3 => {
+                record.flags = value_parts[0].parse().ok();
+                record.tag = Some(value_parts[1].to_string());
+                record.value = value_parts[2..].join(" ");
             }
-            DNSRecordType::NAPTR => {
-                if value_parts.len() >= 5 {
-                    record.order = value_parts[0].parse().ok();
-                    record.preference = value_parts[1].parse().ok();
-                    record.flags = Some(value_parts[2].chars().next().unwrap_or_default() as u8);
-                    record.regex = Some(value_parts[3].to_string());
-                    record.replacement = Some(value_parts[4].to_string());
-                }
+            DNSRecordType::NAPTR if value_parts.len() >= 5 => {
+                record.order = value_parts[0].parse().ok();
+                record.preference = value_parts[1].parse().ok();
+                record.flags = Some(value_parts[2].chars().next().unwrap_or_default() as u8);
+                record.regex = Some(value_parts[3].to_string());
+                record.replacement = Some(value_parts[4].to_string());
             }
             _ => {}
         }

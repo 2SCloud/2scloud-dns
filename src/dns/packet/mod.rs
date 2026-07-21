@@ -52,30 +52,30 @@ impl DNSPacket {
         let header = Header::from_bytes(&buf[pos..])?;
         pos += Header::DNS_HEADER_LEN;
 
-        let mut questions = Vec::new();
+        let mut questions = Vec::with_capacity((header.qdcount as usize).min(buf.len()));
         for _ in 0..header.qdcount {
-            let (q, consumed) = QuestionSection::from_bytes(&buf, pos)?;
+            let (q, consumed) = QuestionSection::from_bytes(buf, pos)?;
             pos += consumed;
             questions.push(q);
         }
 
-        let mut answers = Vec::new();
+        let mut answers = Vec::with_capacity((header.ancount as usize).min(buf.len()));
         for _ in 0..header.ancount {
-            let (ans, consumed) = AnswerSection::from_bytes(&buf, pos)?;
+            let (ans, consumed) = AnswerSection::from_bytes(buf, pos)?;
             pos += consumed;
             answers.push(ans);
         }
 
-        let mut authorities = Vec::new();
+        let mut authorities = Vec::with_capacity((header.nscount as usize).min(buf.len()));
         for _ in 0..header.nscount {
             let (ns, consumed) = AuthoritySection::from_bytes(buf, pos)?;
             pos += consumed;
             authorities.push(ns);
         }
 
-        let mut additionals = Vec::new();
+        let mut additionals = Vec::with_capacity((header.arcount as usize).min(buf.len()));
         for _ in 0..header.arcount {
-            let (add, consumed) = AdditionalSection::from_bytes(&buf, pos)?;
+            let (add, consumed) = AdditionalSection::from_bytes(buf, pos)?;
             pos += consumed;
             additionals.push(add);
         }
@@ -104,12 +104,11 @@ impl DNSPacket {
     /// assert!(bytes.len() >= 12);
     /// ```
     pub fn to_bytes(&self) -> Result<Vec<u8>, SCloudException> {
-        let mut bytes = Vec::new();
-
-        if let Err(_) = self.header.to_bytes() {
-            return Err(SCloudException::SCLOUD_HEADER_BYTES_EMPTY);
-        }
-        bytes.extend_from_slice(&self.header.to_bytes()?);
+        // Serialize the header once (it was previously computed twice), and
+        // start with a typical UDP-response capacity to avoid early reallocs.
+        let header = self.header.to_bytes()?;
+        let mut bytes = Vec::with_capacity(512);
+        bytes.extend_from_slice(&header);
 
         for q in &self.questions {
             bytes.extend_from_slice(&q.to_bytes()?);
